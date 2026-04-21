@@ -1,0 +1,41 @@
+#!/bin/bash
+set -e
+
+echo "=== Starting Advanced Custom R Package Installation ==="
+
+Rscript -e '
+
+options(warn=1)
+options(repos = c(CRAN = "https://cloud.r-project.org/"))
+
+cran_pkgs <- c(
+  "RColorBrewer", "UpSetR", "abind", "data.table", "dendextend", "dimRed",
+  "dplyr", "energy", "ggalluvial", "ggplot2", "ggpubr", "ggraph", "ggrepel",
+  "httr", "igraph", "jsonlite", "maptpx", "networkD3", "optparse", "pheatmap",
+  "plotly", "proxy", "readr", "readxl", "reshape2", "scales", "seriation",
+  "stringr", "tidyr", "tidyverse", "tidytext", "tm", "topicmodels", "umap", "viridis"
+)
+
+missing_pkgs <- cran_pkgs[!(cran_pkgs %in% installed.packages()[,"Package"])]
+
+if(length(missing_pkgs) > 0) {
+  message("Installing missing CRAN packages: ", paste(missing_pkgs, collapse=", "))
+  install.packages(missing_pkgs, Ncpus = 4)
+} else {
+  message("All CRAN packages are already installed.")
+}
+
+if (!requireNamespace("BiocManager", quietly = TRUE)) {
+  install.packages("BiocManager")
+}
+
+bioc_pkgs <- c("clusterProfiler", "org.Hs.eg.db")
+missing_bioc <- bioc_pkgs[!(bioc_pkgs %in% installed.packages()[,"Package"])]
+
+if(length(missing_bioc) > 0) {
+  message("Installing missing Bioconductor packages...")
+  BiocManager::install(missing_bioc, ask=FALSE, update=FALSE, Ncpus=4)
+}
+'
+
+echo "=== Installation Script Finished Successfully ==="

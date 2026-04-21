@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -ex
+
+# This is the master script for the capsule.
+Rscript /code/snpic_ss_definitive_edition/run_snpic.R \
+  --input_folder "/data/sig_snp_list/" \
+  --snp_gene_map "/code/snpic_ss_definitive_edition/snp_gene_map_merged_finngen_ukbb.txt" \
+  --master_map "/code/snpic_ss_definitive_edition/master_disease_mapping.csv" \
+  --out_prefix "/results/snpic_geneasword" \
+  --k_min 5 \
+  --k_max 40 \
+  --n_bootstrap 50 \
+  --cores 16 \
+  --mode "gene" \
+  --model "lda"
+
+echo "Run completed successfully!"

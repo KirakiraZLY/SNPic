@@ -1,0 +1,230 @@
+filename,trait,label1,label2
+C3_BREAST_EXALLC.list,Breast Cancer,Cancer,FinnGen
+C3_BRAIN_EXALLC.list,Brain Cancer,Cancer,FinnGen
+C3_COLON_EXALLC.list,Colon Cancer,Cancer,FinnGen
+C3_COLORECTAL_ADENO_EXALLC.list,Colorectal Adenocarcinoma Cancer,Cancer,FinnGen
+C3_COLORECTAL_NEUROENDO_EXALLC.list,Colorectal Neuroendocrine Tumor,Cancer,FinnGen
+C3_MANTLE_CELL_LYMPHOMA_EXALLC.list,Mantle Cell Lymphoma,Cancer,FinnGen
+C3_MARGINAL_ZONE_LYMPHOMA_EXALLC.list,Marginal Zone Lymphoma,Cancer,FinnGen
+C3_MELANOMA_SKIN_EXALLC.list,Melanoma Skin Cancer,Cancer,FinnGen
+E4_HYPERLIPNAS.list,Hyperlipidemia,MC,FinnGen
+E4_OBESITY.list,Obesity,MC,FinnGen
+F5_ADHD.list,ADHD,Psy,FinnGen
+F5_ALZHDEMENT.list,Alzheimer's,Psy,FinnGen
+F5_ANXIETY.list,Anxiety,Psy,FinnGen
+F5_BIPO.list,Bipolar,Psy,FinnGen
+F5_DEMENTIA.list,Dementia,Psy,FinnGen
+F5_DEPRESSION_PSYCHOTIC.list,Depression,Psy,FinnGen
+F5_OCD.list,Obsessive Compulsive Disorder,Psy,FinnGen
+F5_SCHIZPER.list,Schizophrenia,Psy,FinnGen
+FG_CARDMYO.list,Cardiomyopathy,MC,FinnGen
+FG_CVD.list,Cardiovascular Disease,MC,FinnGen
+GOUT_IDIO,Idiopathic gout,MC,FinnGen
+GOUT_STRICT.list,Gout,MC,FinnGen
+G6_PARKINSON.list,Parkinson's Disease,Psy,FinnGen
+I9_HEARTFAIL_AND_CHD.list,Heart Failure and Coronary Heart Disease,MC,FinnGen
+I9_HEARTFAIL_AND_HYPERTCARDIOM.list,Heart Failure and Hypertensive Cardiomyopathy,MC,FinnGen
+I9_HYPTENS.list,Hypertension,MC,FinnGen
+I9_HYPERTROCARDMYOP.list,hypertrophic cardiomyopathy,MC,FinnGen
+I9_HYPTENSEC.list,Secondary hypertension,MC,FinnGen
+KRA_PSY_AUTISM_EXMORE.list,Autism Spectrum Disorder,Psy,FinnGen
+KRA_PSY_TIC.list,Tourette Syndrome,Psy,FinnGen
+L12_PSORI_GUTTATE.list,Guttate Psoriasis,Immuno,FinnGen
+L12_PSORI_VULG.list,Psoriasis Vulgaris,Immuno,FinnGen
+M13_MCTD.list,Mixed Connective Tissue Disease,Immuno,FinnGen
+M13_PSORIARTH.list,Psoriatic Arthritis,Immuno,FinnGen
+M13_SJOGREN.list,Sjogren's Syndrome,Immuno,FinnGen
+R18_ANOREXIA.list,Anorexia Nervosa,Psy,FinnGen
+RHEUMA_SEROPOS_STRICT.list,Seropositive Rheumatoid Arthritis Strict,Immuno,FinnGen
+SLE_FG.list,Systemic Lupus Erythematosus,Immuno,FinnGen
+T1D.list,Type 1 Diabetes,Immuno,FinnGen
+T2D.list,Type 2 Diabetes,MC,FinnGen
+C3_BONE_CARTILAGE_EXALLC.list,Bone Cancer,Cancer,FinnGen
+C3_BREAST_ERNEG_EXALLC.list,Breast Cancer ER-negative,Cancer,FinnGen
+C3_BREAST_ERPLUS_EXALLC.list,Breast Cancer ER-positive,Cancer,FinnGen
+C3_COLON_ADENO_EXALLC.list,Colon Adenomas,Cancer,FinnGen
+C3_COLORECTAL_EXALLC.list,Colorectal Cancer,Cancer,FinnGen
+C3_MELANOMA_EXALLC.list,Melanoma Cancer,Cancer,FinnGen
+C3_SKIN_EXALLC.list,Skin Cancer,Cancer,FinnGen
+CD2_BENIGN_SKIN.list,Other Skin Cancer,Cancer,FinnGen
+C3_MACROGLOBULINEMIA_EXALLC.list,lymphoplasmacytic lymphoma,Cancer,FinnGen
+F5_DEPRESSIO.list,Unipolar Depression,Psy,FinnGen
+GOUT_IDIO.list,Gout Idiopathic,MC,FinnGen
+I9_HEARTFAIL_AND_OVERWEIGHT.list,Heart Failure and Overweight,MC,FinnGen
+I9_HEARTFAIL.list,Heart Failure,MC,FinnGen
+I9_HYPTENSESS.list,Essential Hypertension,MC,FinnGen
+I9_IHD.list,Ischemic Heart Disease,MC,FinnGen
+L12_LUPUS.list,Lupus,Immuno,FinnGen
+L12_PSORIASIS.list,Psoriasis,Immuno,FinnGen
+M13_GOUT.list,Gout Wide,MC,FinnGen
+PSORI_STRICT.list,Psoriasis Strict,Immuno,FinnGen
+RHEUMA_NOS.list,Rheumatoid Arthritis,Immuno,FinnGen
+RHEUMA_OTHER_WIDE.list,Rheumatoid Arthritis Other,Immuno,FinnGen
+RHEUMA_SERONEG.list,Rheumatoid Arthritis Seronegative,Immuno,FinnGen
+RHEUMA_SEROPOS_STRICT.list,Rheumatoid Arthritis Seropositive,Immuno,FinnGen
+SLE_OTH.list,Systemic Lupus Erythematosus Other,Immuno,FinnGen
+T1D_EARLY.list,Type 1 Diabetes Early,Immuno,FinnGen
+T1D_STRICT2.list,Type 1 Diabetes Strict,Immuno,FinnGen
+DRUGADVERS_SYSTEMIC_LUPUS_ERYTHEMAT.list,Drug-induced Systemic Lupus Erythematosus,Immuno,FinnGen
+GOUT_KIDNEY.list,Gout with Kidney Involvement,MC,FinnGen
+GOUT_NOS.list,Gout Not Otherwise Specified,MC,FinnGen
+GOUT_SCND.list,Secondary Gout,MC,FinnGen
+L12_PSORI_ACRODERM.list,Psoriatic Acrodermatitis,Immuno,FinnGen
+L12_PSORI_NAS.list,Psoriasis Not Otherwise Specified,Immuno,FinnGen
+L12_PSORI_PUSTGEN.list,Generalized Pustular Psoriasis,Immuno,FinnGen
+L12_PSORI_PUSTUPALM.list,Pustulosis Palmaris et Plantaris,Immuno,FinnGen
+M13_ANKYLOSPON_STRICT.list,Ankylosing Spondylitis Strict,Immuno,FinnGen
+M13_ANKYLOSPON.list,Ankylosing Spondylitis,Immuno,FinnGen
+M13_MONOARTHRITIS.list,Monoarthritis,Immuno,FinnGen
+M13_MULTIFIBRO.list,Multifocal Fibromatosis,Immuno,FinnGen
+M13_POLNODOSA.list,Polyarteritis Nodosa,Immuno,FinnGen
+M13_POLYARTERETAL.list,Polyarteritis,Immuno,FinnGen
+M13_POLYARTHRITIS.list,Polyarthritis,Immuno,FinnGen
+M13_POLYARTHROPATHIES.list,Polyarthropathies,Immuno,FinnGen
+M13_PYOGARTH.list,Pyogenic arthritis,Immuno,FinnGen
+M13_RHEUMA.list,Rheuma,Immuno,FinnGen
+M13_RHEUMATISM.list,Rheumatism,Immuno,FinnGen
+M13_SPONDYLINFLAMNAS.list,Inflammatory Spondylopathy,Immuno,FinnGen
+M13_SYSTSLCE.list,Systemic Sclerosis,Immuno,FinnGen
+RHEUMA_ARHTROPAT_REACTIVE.list,Reactive Arthropathy,Immuno,FinnGen
+RHEUMA_SEROPOS_WIDE.list,Seropositive Rheumatoid Arthritis Wide,Immuno,FinnGen
+RHEUMAT_LUNG.list,Rheumatoid Lung Disease,Immuno,FinnGen
+SPONDYLOARTHRITIS.list,Spondyloarthritis,Immuno,FinnGen
+SYSTINOTH_FG.list,Systemic Inflammatory Disorder,Immuno,FinnGen
+SYSTSCLE_STRICT.list,Systemic Sclerosis Strict,Immuno,FinnGen
+M13_ARTHINOTH.list,Other Specified Arthritis,Immuno,FinnGen
+M13_ARTHROSIS_INCLAVO.list,Arthrosis Involving Clavicle,Immuno,FinnGen
+M13_ARTHROSIS_KNEE_PRIM_KNEESURG.list,Primary Knee Arthrosis with Knee Surgery,Immuno,FinnGen
+M13_ARTHROSIS_KNEE.list,Knee Arthrosis,Immuno,FinnGen
+M13_ARTHROSIS_OTH.list,Other Arthrosis,Immuno,FinnGen
+M13_ARTHROSIS_POLY.list,Polyarthrosis,Immuno,FinnGen
+M13_ARTHROSIS.list,Arthrosis,Immuno,FinnGen
+M13_ARTHTROSIS_COX_PRIM_HIPSURG.list,Primary Coxarthrosis with Hip Surgery,Immuno,FinnGen
+M13_ARTHTROSIS_COX_PRIM_ICD10.list,Primary Coxarthrosis (ICD-10),Immuno,FinnGen
+M13_ARTHTROSIS_COX.list,Coxarthrosis,Immuno,FinnGen
+M13_LOWBACKPAIN.list,Low Back Pain,Immuno,FinnGen
+M13_LOWBACKPAINORANDSCIATICA.list,Low Back Pain or Sciatica,Immuno,FinnGen
+M13_SPINSTENOSIS.list,Spinal Stenosis,Immuno,FinnGen
+M13_SPONDYLOLISTHESIS.list,Spondylolisthesis,Immuno,FinnGen
+M13_SPONDYLOPATHY.list,Spondylopathy,Immuno,FinnGen
+M13_SPONDYLOSIS.list,Spondylosis,Immuno,FinnGen
+M13_OSTEOCHONDRO.list,Osteochondrosis,Immuno,FinnGen
+M13_OSTEOCHONDROPATHY.list,Osteochondropathy,Immuno,FinnGen
+M13_OSTEOMALACIA.list,Osteomalacia,Immuno,FinnGen
+M13_OSTEOMYELITIS.list,Osteomyelitis,Immuno,FinnGen
+M13_OSTEOMYELVERTEB.list,Vertebral Osteomyelitis,Immuno,FinnGen
+M13_OSTEONECROSIS.list,Osteonecrosis,Immuno,FinnGen
+M13_OSTEOPATHYINOTH.list,Other Osteopathy,Immuno,FinnGen
+M13_OSTEOPOROSIS.list,Osteoporosis,Immuno,FinnGen
+F5_AGORAPHOBIA.list,Agoraphobia,Psy,FinnGen
+F5_ALLANXIOUS.list,Anxiety Disorder,Psy,FinnGen
+F5_ANAPER.list,Panic Disorder,Psy,FinnGen
+F5_ANOREX.list,Anorexia Nervosa Broad,Psy,FinnGen
+F5_ANXPER.list,Anxiety Personality Disorder,Psy,FinnGen
+F5_BEHEMOCHILD.list,Childhood Behavioral Disorder,Psy,FinnGen
+F5_BULIMIA.list,Bulimia Nervosa,Psy,FinnGen
+F5_DEMINOTH.list,Other Dementia,Psy,FinnGen
+F5_DEMNAS.list,Unspecified Dementia,Psy,FinnGen
+F5_DEPPER.list,Depressive Personality Disorder,Psy,FinnGen
+F5_DEPRESSION_DYSTHYMIA.list,Dysthymia,Psy,FinnGen
+F5_DEPRESSION_RECURRENT.list,Recurrent Depression,Psy,FinnGen
+F5_DISPER.list,Dissociative Personality Disorder,Psy,FinnGen
+F5_DISSOCIATIVE.list,Dissociative Disorder,Psy,FinnGen
+F5_EATOTH.list,Other Eating Disorder,Psy,FinnGen
+F5_EMOCHILD.list,Childhood Emotional Disorder,Psy,FinnGen
+F5_EMOPER.list,Emotional Personality Disorder,Psy,FinnGen
+F5_GAD.list,Generalized Anxiety Disorder,Psy,FinnGen
+F5_GENDER.list,Gender Identity Disorder,Psy,FinnGen
+F5_HABIT.list,Habit and Impulse Disorder,Psy,FinnGen
+F5_HALLUCIN.list,Hallucinogen-Related Disorder,Psy,FinnGen
+F5_BEHAVE.list,Behavioral Disorders,Psy,FinnGen
+F5_HISPER.list,Histrionic Personality Disorder,Psy,FinnGen
+F5_HYPERKIN.list,Hyperkinetic Disorders,Psy,FinnGen
+F5_HYPERSOMNIA.list,Hypersomnia Disorders,Psy,FinnGen
+F5_INSOMNIA.list,Insomnia Disorders,Psy,FinnGen
+F5_KELAMENT.list,Kela Mental Disorders,Psy,FinnGen
+F5_KELARET.list,Kela Neurotic Disorders,Psy,FinnGen
+F5_MANIA.list,Mania and Bipolar Disorders,Psy,FinnGen
+F5_MENTALUNSPE.list,Unspecified Mental Disorders,Psy,FinnGen
+F5_OPIOIDS.list,Opioid Use Disorders,Psy,FinnGen
+F5_OTHERSUB.list,Other Substance Use Disorders,Psy,FinnGen
+F5_PANIC.list,Panic Disorders,Psy,FinnGen
+F5_PARAPER.list,Paranoid Personality Disorder,Psy,FinnGen
+F5_PERSBEHORG.list,Personality and Behavioral Disorders due to Organic Causes,Psy,FinnGen
+F5_PERSMOOD.list,Persistent Mood Disorders,Psy,FinnGen
+F5_PERSOCHANGE.list,Personality Change due to Medical Condition,Psy,FinnGen
+F5_PERSOTH.list,Other Personality Disorders,Psy,FinnGen
+F5_PHYSBEHOTH.list,Other Physiological and Behavioral Disorders,Psy,FinnGen
+F5_PSYCHDEV.list,Psychological Development Disorders,Psy,FinnGen
+F5_PSYCHDEVOTH.list,Other Psychological Development Disorders,Psy,FinnGen
+F5_PSYCHOTH.list,Other Psychotic Disorders,Psy,FinnGen
+F5_PSYTRANS.list,Psychiatric Transition States,Psy,FinnGen
+F5_PTSD.list,Post-Traumatic Stress Disorder,Psy,FinnGen
+F5_SCHIZOAFF.list,Schizoaffective Disorders,Psy,FinnGen
+F5_SCHIZOTYP.list,Schizotypal Disorder,Psy,FinnGen
+F5_SLEEP_NOS.list,Sleep Disorders Not Otherwise Specified,Psy,FinnGen
+F5_SLEEPTERRORS.list,Sleep Terrors,Psy,FinnGen
+F5_SLEEPWAKE.list,Sleep-Wake Disorders,Psy,FinnGen
+F5_SLEEPWALKING.list,Sleepwalking,Psy,FinnGen
+F5_SOCPHOB.list,Social Phobia,Psy,FinnGen
+F5_SOLVENT.list,Solvent Use Disorders,Psy,FinnGen
+F5_SOMATOFORM.list,Somatoform Disorders,Psy,FinnGen
+F5_SPEECH.list,Speech Disorders,Psy,FinnGen
+F5_STIMUL.list,Stimulant Use Disorders,Psy,FinnGen
+F5_STRESSOTH.list,Other Stress-Related Disorders,Psy,FinnGen
+F5_SUBSNOALCO.list,Substance Use Disorders Excluding Alcohol,Psy,FinnGen
+F5_UNSORG.list,Unspecified Organic Mental Disorders,Psy,FinnGen
+F5_VASCDEM.list,Vascular Dementia,Psy,FinnGen
+DRUGADVERS_INTERSTITIAL_LUNG_DISORD_UNSPE.list,ILD,MC,FinnGen
+C3_BONE_CARTILAGE_EXALLC.list,Bone Cancer,Cancer,FinnGen
+C3_KIDNEY_NOTRENALPELVIS_EXALLC.list,Kidney Cancer,Cancer,FinnGen
+E4_HYPERLIPMIX.list,Mixed Hyperlipidemia,MC,FinnGen
+E4_OBESITYCAL.list,Obesity due to Excess Calories,MC,FinnGen
+E4_OBESITYNAS.list,Obesity Unspecified,MC,FinnGen
+E4_OBESITYXTRMALV.list,Extreme Obesity with Alveolar Hypoventilation,MC,FinnGen
+FG_DOAAC.list,Diseases of Arteries Arterioles and Capillaries,MC,FinnGen
+I9_HYPTENSHD.list,Hypertensive Heart Disease,MC,FinnGen
+I9_HYPTENSRD.list,Hypertensive Renal Disease,MC,FinnGen
+I9_ICH.list,Intracerebral Hemorrhage,MC,FinnGen
+I9_INTRACRA.list,Intracranial Hemorrhage,MC,FinnGen
+I9_LBBB.list,Left Bundle Branch Block,MC,FinnGen
+I9_LYMPHOTH.list,Other Disorders of Lymphatic Vessels and Lymph Nodes,MC,FinnGen
+M13_ARTHROPATHIES.list,Arthropathies,Immuno,FinnGen
+M13_LIMBPAIN.list,Pain in Limb,Immuno,FinnGen
+M13_MUSCLE.list,Muscle Disorders,Immuno,FinnGen
+SPONDYLOPATHY_FG.list,Spondylopathy2,Immuno,FinnGen
+ASTHMA_OBESITY.list,Obesity due to Asthma,MC,FinnGen
+C_DIFFICILE_ENTEROCOLITIS.list,Enterocolitis due to Clostridium difficile,MC,FinnGen
+C_STROKE.list,Stroke,MC,FinnGen
+categorical-20001-both_sexes-1022.list,colon cancer/sigmoid cancer,Cancer,UKBB
+categorical-20001-both_sexes-1023.list,rectal cancer,Cancer,UKBB
+categorical-20001-both_sexes-1052.list,hodgkins lymphoma,Cancer,UKBB
+categorical-20002-both_sexes-1222.list,type 1 diabetes,Immuno,UKBB
+categorical-20002-both_sexes-1382.list,sjogren's syndrome/sicca syndrome,Immuno,UKBB
+categorical-20002-both_sexes-1466.list,gout,MC,UKBB
+categorical-20002-both_sexes-1470.list,Anorexia Nervosa,Psy,UKBB
+categorical-20544-both_sexes-14.list,Autism spectrum disorder,Psy,UKBB
+categorical-20544-both_sexes-15.list,Anxiety,Psy,UKBB
+categorical-20544-both_sexes-18.list,ADHD,Psy,UKBB
+categorical-20544-both_sexes-7.list,Obsessive compulsive disorder (OCD),Psy,UKBB
+categorical-20002-both_sexes-1223.list,Type 2 Diabetes,MC,UKBB
+categorical-20002-both_sexes-1065.list,Hypertension,MC,UKBB
+icd10-F01-both_sexes.list,Dementia Vascular,Psy,UKBB
+icd10-G30-both_sexes.list,Alzheimer's disease,Psy,UKBB
+icd10-I15-both_sexes.list,Secondary hypertension,MC,UKBB
+icd10-I25-both_sexes.list,Chronic ischaemic heart disease,MC,UKBB
+icd10-I42-both_sexes.list,Cardiomyopathy,MC,UKBB
+icd10-I50-both_sexes.list,Heart failure,MC,UKBB
+icd10-M05-both_sexes.list,Seropositive rheumatoid arthritis,Immuno,UKBB
+icd10-M32-both_sexes.list,Systemic lupus erythematosus,Immuno,UKBB
+phecode-172.1-both_sexes.list,Melanomas of skin,Cancer,UKBB
+phecode-174-both_sexes.list,Breast cancer,Cancer,UKBB
+phecode-272.13-both_sexes.list,Mixed hyperlipidemia,MC,UKBB
+phecode-278.1-both_sexes.list,Obesity,MC,UKBB
+phecode-429.2-both_sexes.list,Abnormal function study of cardiovascular system,MC,UKBB
+phecode-695.4-both_sexes.list,Lupus,Immuno,UKBB
+phecode-696.4-both_sexes.list,Psoriasis,Immuno,UKBB
+phecode-696.41-both_sexes.list,Psoriasis vulgaris,Immuno,UKBB
+phecode-696.42-both_sexes.list,Psoriatic arthropathy,Immuno,UKBB
+phecode-709-both_sexes.list,Diffuse diseases of connective tissue,Immuno,UKBB
+phecode-714.1-both_sexes.list,Rheumatoid arthritis,Immuno,UKBB
