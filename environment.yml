@@ -1,0 +1,53 @@
+name: snpic_env
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - r-base>=4.5.1
+  # ==========================================
+  # CRAN Packages
+  # ==========================================
+  - r-tidyverse
+  - r-data.table
+  - r-dplyr
+  - r-tidyr
+  - r-readr
+  - r-readxl
+  - r-stringr
+  - r-reshape2
+  - r-abind
+  - r-tidytext
+  - r-jsonlite
+  - r-httr
+  - r-optparse
+
+  # 可视化与绘图
+  - r-ggplot2
+  - r-ggpubr
+  - r-ggrepel
+  - r-ggraph
+  - r-ggalluvial
+  - r-pheatmap
+  - r-plotly
+  - r-networkd3
+  - r-upsetr
+  - r-rcolorbrewer
+  - r-viridis
+  - r-scales
+  - r-igraph
+  - r-umap
+  - r-dimred
+  - r-dendextend
+  - r-proxy
+  - r-seriation
+  - r-energy
+  - r-topicmodels
+  - r-tm
+  - r-maptpx
+
+  # ==========================================
+  # Bioconductor Packages
+  # ==========================================
+  - bioconductor-clusterprofiler
+  - bioconductor-org.hs.eg.db
