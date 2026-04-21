@@ -32,16 +32,28 @@ This project requires **R (>= 4.5)**.
 The analysis pipeline relies on a variety of R packages for data manipulation, topic modeling, dimensionality reduction, network visualization, and pathway enrichment. 
 
 * **CRAN Packages**: `tidyverse`, `data.table`, `topicmodels`, `umap`, `igraph`, `ggplot2`, `optparse`, etc.
-* **Bioconductor Packages**: `clusterProfiler`
+* **Bioconductor Packages**: `clusterProfiler`, `org.Hs.eg.db`
 
-### Quick Installation
+### Option 1: Conda Environment (Highly Recommended)
+For local or server users, we highly recommend using Conda. This method automatically handles all complex underlying C++ libraries (e.g., `gsl` for `topicmodels`, `libxml2` for `tidyverse`) and safely avoids compilation errors.
 
-You can install all required dependencies by running the following script in your R console. It will automatically detect missing packages and install them:
+Simply run the following commands in your terminal using the provided `environment.yml` file:
 
-```R
+```bash
+# 1. Create the environment from the provided YAML file
+conda env create -f environment.yml
+
+# 2. Activate the environment
+conda activate snpic_env
+```
+
+### Option 2: Manual R Console Installation
+If you prefer to install packages manually or do not have Conda installed, you can run the following script in your R console. It will automatically detect missing packages and install them:
+
+```r
 # 1. Define required CRAN packages
 cran_packages <- c(
-  "data.table", "dplyr", "tidyr", "reshape2", "stringr", "readr", "readxl", "tidyverse", "abind",
+  "data.table", "dplyr", "tidyr", "reshape2", "stringr", "readr", "readxl", "tidyverse", "tidytext", "abind",
   "optparse", "httr", "jsonlite",
   "topicmodels", "tm", "maptpx", "umap", "dendextend", "proxy", "seriation", "energy", "dimRed",
   "ggplot2", "ggrepel", "ggpubr", "ggraph", "igraph", "UpSetR", "pheatmap", 
@@ -52,32 +64,28 @@ cran_packages <- c(
 new_cran_packages <- cran_packages[!(cran_packages %in% installed.packages()[,"Package"])]
 if(length(new_cran_packages)) install.packages(new_cran_packages)
 
-# 2. Install Bioconductor packages (clusterProfiler)
+# 2. Install Bioconductor packages
 if (!requireNamespace("BiocManager", quietly = TRUE)) {
   install.packages("BiocManager")  
 }
-bioc_packages <- c("clusterProfiler")
+bioc_packages <- c("clusterProfiler", "org.Hs.eg.db")
 new_bioc_packages <- bioc_packages[!(bioc_packages %in% installed.packages()[,"Package"])]
 if(length(new_bioc_packages)) BiocManager::install(new_bioc_packages)
 
 print("All dependencies have been successfully installed!")
-
 ```
-
-***Notes on Specific Packages***   
-maptpx: Used for mixed-membership topic modeling.   
-
-clusterProfiler: Requires Bioconductor. Depending on your system, it might prompt you to update other Bioconductor dependencies. It is generally recommended to update them (a for all) to avoid version conflicts.   
-
-***Note on errors when installing clusterProfiler in R***   
-If you encounter errors when installing clusterProfiler, it is recommended to install it directly using Conda. Try to avoid compiling complex packages from scratch using install.packages or BiocManager in R. You can use the following commands:
-```
+**Fallback for `clusterProfiler` Installation Errors:**   
+```bash
 conda install -c conda-forge -c bioconda bioconductor-clusterprofiler
 ```
 
-***Note on installation time of dependency***   
-Note: Installation may take around **20-30 minutes** depending on your network and environment due to the large number of bioinformatics dependencies, especially long waiting of **ClusterProfiler**.  
 
+> **📝 Notes on Installation:**
+> * **`maptpx`**: Used for mixed-membership topic modeling.
+> * **`clusterProfiler`**: Requires Bioconductor. Depending on your system, it might prompt you to update other Bioconductor dependencies. It is generally recommended to update them (press `a` for all) to avoid version conflicts.
+> * **⚠️ Installation Errors**: If you choose Option 2 and encounter C++ compilation errors when installing `clusterProfiler` or `topicmodels`, please switch to **Option 1 (Conda)**, as it resolves these system-level dependencies seamlessly.
+If you encounter C++ compilation errors when installing `clusterProfiler` natively in R, we highly recommend bypassing the scratch compilation and installing it directly using Conda. You can resolve this by running the following command in your terminal:
+> * **⏳ Time Expectation**: Installation may take around **20-30 minutes** depending on your network and environment due to the large number of bioinformatics dependencies.
 
 ## 📊 Input Data Specifications 
 
