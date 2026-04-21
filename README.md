@@ -84,7 +84,7 @@ conda install -c conda-forge -c bioconda bioconductor-clusterprofiler
 > * **`maptpx`**: Used for mixed-membership topic modeling.
 > * **`clusterProfiler`**: Requires Bioconductor. Depending on your system, it might prompt you to update other Bioconductor dependencies. It is generally recommended to update them (press `a` for all) to avoid version conflicts.
 > * **⚠️ Installation Errors**: If you choose Option 2 and encounter C++ compilation errors when installing `clusterProfiler` or `topicmodels`, please switch to **Option 1 (Conda)**, as it resolves these system-level dependencies seamlessly.
-If you encounter C++ compilation errors when installing `clusterProfiler` natively in R, we highly recommend bypassing the scratch compilation and installing it directly using Conda. You can resolve this by running the following command in your terminal:
+If you encounter C++ compilation errors when installing `clusterProfiler` natively in R, we highly recommend bypassing the scratch compilation and installing it directly using Conda. You can resolve this by running the command above in your terminal.
 > * **⏳ Time Expectation**: Installation may take around **20-30 minutes** depending on your network and environment due to the large number of bioinformatics dependencies.
 
 ## 📊 Input Data Specifications 
