@@ -254,8 +254,9 @@ Upon successful execution, the specified out_prefix directory will contain:
 
 
 ## 🎒 Our paper
-doi: please wait a bit 🥹🥹🥹   
-Enjoy reading. 😈😈😈
+Our new preprint "SNPic" is officially live on bioRxiv!  
+DOI: [https://doi.org/10.64898/2026.04.22.720106](https://doi.org/10.64898/2026.04.22.720106)   
+Enjoy reading it, and feel free to drop your brutal feedback! 😈😈😈
 ![SNPic description](./figure/fig1_graphical_abstract.png)
 
 ## ⚖️ License
