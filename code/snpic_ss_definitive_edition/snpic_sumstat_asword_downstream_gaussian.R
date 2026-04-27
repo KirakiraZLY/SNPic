@@ -26,8 +26,8 @@ run_downstream_ss_gaussian <- function(input_mat, final_res, meta_df, best_k, be
   dtm_scaled <- as.data.frame(t(scale(t(matrix_result))))
   dtm_scaled <- dtm_scaled - min(dtm_scaled, na.rm = TRUE)
 
-  set.seed(seed)
-  results_umap_pca_gaussian <- plot_umap_pca_from_matrix(dtm_scaled, prefix_gaussian, master_map)
+  # set.seed(seed)
+  # results_umap_pca_gaussian <- plot_umap_pca_from_matrix(dtm_scaled, prefix_gaussian, master_map)
   set.seed(seed)
   out_gaussian <- run_mixed_membership(matrix_result, k_topic, master_map = master_map)
   gaussian_topic_matrix_std <- out_gaussian$topic_matrix2

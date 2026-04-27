@@ -49,11 +49,11 @@ calculate_shared_snp_matrix <- function(folder1, folder2 = folder1, plot_heatmap
       scale_fill_gradient(low = "white", high = "red") +
       labs(x = "Sumstats", y = "Sumstats", fill = "Shared SNPs") +
       theme(axis.text.x = element_blank(), axis.text.y = element_blank())
-    cat("================ Plot heatmap ================ \n")
-    print(p1)
-    if (!is.null(prefix)) {
-      ggsave(paste0(prefix, "_heatmap.png"), p1, width = 10, height = 8)
-    }
+    # cat("================ Plot heatmap ================ \n")
+    # print(p1)
+    # if (!is.null(prefix)) {
+    #   ggsave(paste0(prefix, "_heatmap.png"), p1, width = 10, height = 8)
+    # }
   }
   
   # Hierarchical clustering
@@ -62,7 +62,7 @@ calculate_shared_snp_matrix <- function(folder1, folder2 = folder1, plot_heatmap
     dist_result <- as.dist(1 - cor(result_t, method = "pearson"))
     hc_individuals <- hclust(dist_result, method = "ward.D2")
     
-    pheatmap(result, cluster_rows = hc_individuals, cluster_cols = FALSE, show_colnames = FALSE, fontsize_row = 5)
+    # pheatmap(result, cluster_rows = hc_individuals, cluster_cols = FALSE, show_colnames = FALSE, fontsize_row = 5)
     
     plot(hc_individuals, main = "Hierarchical Clustering of Sumstats", xlab = "", sub = "", cex = 0.6, las = 2)
     rect.hclust(hc_individuals, k = n_cluster, border = 1:n_cluster)
@@ -184,10 +184,10 @@ plot_umap_pca_from_matrix <- function(shared_snp_matrix, prefix=NULL, master_map
     theme_classic() +
     ggtitle("SS as word, UMAP, by label") +
     theme(legend.position = "right")
-  if (!is.na(prefix)){
-    ggsave(paste0(prefix, "_SSword_umap_only.png"), p_umap, width = 10, height = 8)
-  }
-  print(p_umap)
+  # if (!is.na(prefix)){
+  #   ggsave(paste0(prefix, "_SSword_umap_only.png"), p_umap, width = 10, height = 8)
+  # }
+  # print(p_umap)
   
   no_label_diseases <- umap_df %>%
     filter(label == "NoLabel") %>%
@@ -211,10 +211,10 @@ plot_umap_pca_from_matrix <- function(shared_snp_matrix, prefix=NULL, master_map
     geom_text_repel(aes(label = Disease), size = 3, max.overlaps = Inf, force = 10) +
     theme_classic() +
     ggtitle("SS as word, PCA only, by label")
-  if (!is.na(prefix)){
-    ggsave(paste0(prefix, "_SSword_pca_only.png"), p_pca, width = 10, height = 8)
-  }
-  print(p_pca)
+  # if (!is.na(prefix)){
+  #   ggsave(paste0(prefix, "_SSword_pca_only.png"), p_pca, width = 10, height = 8)
+  # }
+  # print(p_pca)
   
   # return plots and intermediate data frames
   return(list(
@@ -264,11 +264,11 @@ run_lda_analysis <- function(result_matrix, prefix = NULL, master_map = NULL, k 
     theme(axis.text.y = element_text(size = 12), 
           legend.position = "right")
   
-  if (!is.null(prefix)) {
-    ggsave(paste0(prefix, "_SSword_snpic_topic_distribution.png"), p_topics, width = 10, height = 12)
-  } else {
-    print(p_topics)
-  }
+  # if (!is.null(prefix)) {
+  #   ggsave(paste0(prefix, "_SSword_snpic_topic_distribution.png"), p_topics, width = 10, height = 12)
+  # } else {
+  #   print(p_topics)
+  # }
   
   ## ----------------------------------------------------------------
   ## Topic distribution: sorted by max topic
@@ -293,10 +293,10 @@ run_lda_analysis <- function(result_matrix, prefix = NULL, master_map = NULL, k 
           plot.margin = margin(10, 10, 10, 10),
           legend.position = "right")
   
-  print(p_sorted)
-  if (!is.null(prefix)) {
-    ggsave(paste0(prefix, "_SSword_snpic_topic_distribution_sorted.png"), p_sorted, width = 10, height = 12)
-  }
+  # print(p_sorted)
+  # if (!is.null(prefix)) {
+  #   ggsave(paste0(prefix, "_SSword_snpic_topic_distribution_sorted.png"), p_sorted, width = 10, height = 12)
+  # }
   
   ## ----------------------------------------------------------------
   ## Top words (Modified Section with Normalization)
@@ -394,10 +394,10 @@ run_lda_analysis <- function(result_matrix, prefix = NULL, master_map = NULL, k 
     ) +
     theme(legend.position = "right")
   
-  if (!is.null(prefix)) {
-    ggsave(paste0(prefix, "_SSword_snpic_umap.png"), p_snpic_umap, width = 10, height = 8)
-  }
-  print(p_snpic_umap)
+  # if (!is.null(prefix)) {
+  #   ggsave(paste0(prefix, "_SSword_snpic_umap.png"), p_snpic_umap, width = 10, height = 8)
+  # }
+  # print(p_snpic_umap)
   
   ## ----------------------------------------------------------------
   ## PCA
@@ -427,10 +427,10 @@ run_lda_analysis <- function(result_matrix, prefix = NULL, master_map = NULL, k 
     ) +
     theme(legend.position = "right")
   
-  if (!is.null(prefix)) {
-    ggsave(paste0(prefix, "_SSword_snpic_pca.png"), p_snpic_pca, width = 10, height = 8)
-  }
-  print(p_snpic_pca)
+  # if (!is.null(prefix)) {
+  #   ggsave(paste0(prefix, "_SSword_snpic_pca.png"), p_snpic_pca, width = 10, height = 8)
+  # }
+  # print(p_snpic_pca)
   
   time_end <- Sys.time()
   cat("LDA + PCA Processing Time: ", time_end - time_start, "\n\n")

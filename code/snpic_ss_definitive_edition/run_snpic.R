@@ -32,6 +32,9 @@ option_list = list(
   make_option(c("--keep_all_traits"), action="store_true", default=FALSE, 
               help="If set, skip the stability filter and keep all traits for downstream analysis. [default= FALSE]"),
   
+  make_option(c("--k_only"), type="integer", default=NULL, 
+              help="[OPTIONAL] Fast mode. Skip bootstrap and run exactly this many topics. Automatically implies --keep_all_traits. [default= %default]", metavar="integer"),
+  
   make_option(c("--mode"), type="character", default="gene", 
               help="Base matrix construction mode: 'gene' (Gene-as-word) or 'ss' (Sumstat-as-word). [default= %default]"),
   make_option(c("--model"), type="character", default="lda", 
@@ -188,179 +191,156 @@ calculate_robust_similarity <- function(bootstrap_list, penalty_lambda = 1.0) {
   return(list(robust_sim = robust_sim, confidence_score = conf))
 }
 
-############################################
-# 5. Phase 1: Bootstrapping across all K
-############################################
-results_by_k <- list() 
-stability_summary <- data.frame(k = integer(), mean_confidence = numeric(), threshold_used = numeric())
+############################################################################
+# 5 & 6 & 7. Phase 1 Dispatch (Bootstrap OR Fast Mode)
+############################################################################
 
-cat("\n============================================\n")
-cat("Phase 1: Bootstrapping and Generating Stability Scores per K\n")
-cat("============================================\n")
-
-for (k in k_range) {
-  cat(sprintf("\nProcessing K = %d ...\n", k))
-  bs_results <- run_lda_bootstrap_parallel(input_mat, k = k, n_iter = n_bootstrap)
+if (is.null(opt$k_only)) {
+  # =========================================================
+  # 正常路线：执行 Bootstrap -> 选择最佳 K -> 画稳定性图
+  # =========================================================
+  results_by_k <- list() 
+  stability_summary <- data.frame(k = integer(), mean_confidence = numeric(), threshold_used = numeric())
   
-  if (length(bs_results) < 10) { cat("  [Warning] Too few successful runs. Skipping.\n"); next }
-  res <- calculate_robust_similarity(bs_results, penalty_lambda = 1.0)
+  cat("\n============================================\n")
+  cat("Phase 1: Bootstrapping and Generating Stability Scores per K\n")
+  cat("============================================\n")
   
-  if(!is.null(res)) {
-    scores <- res$confidence_score
-    avg_conf <- mean(scores, na.rm = TRUE)
-    thresh_50 <- as.numeric(quantile(scores, 0.50, na.rm = TRUE))
-    current_thresh <- min(0.25, thresh_50)
+  for (k in k_range) {
+    cat(sprintf("\nProcessing K = %d ...\n", k))
+    bs_results <- run_lda_bootstrap_parallel(input_mat, k = k, n_iter = n_bootstrap)
     
-    stability_summary <- rbind(stability_summary, data.frame(k = as.numeric(k), mean_confidence = avg_conf, threshold_used = current_thresh))
-    results_by_k[[as.character(k)]] <- res
-    cat(sprintf("  -> K=%d | Mean Bootstrap Confidence: %.4f | Downstream Thresh: %.3f\n", k, avg_conf, current_thresh))
+    if (length(bs_results) < 10) { cat("  [Warning] Too few successful runs. Skipping.\n"); next }
+    res <- calculate_robust_similarity(bs_results, penalty_lambda = 1.0)
+    
+    if(!is.null(res)) {
+      scores <- res$confidence_score
+      avg_conf <- mean(scores, na.rm = TRUE)
+      thresh_50 <- as.numeric(quantile(scores, 0.50, na.rm = TRUE))
+      current_thresh <- min(0.25, thresh_50)
+      
+      stability_summary <- rbind(stability_summary, data.frame(k = as.numeric(k), mean_confidence = avg_conf, threshold_used = current_thresh))
+      results_by_k[[as.character(k)]] <- res
+      cat(sprintf("  -> K=%d | Mean Bootstrap Confidence: %.4f | Downstream Thresh: %.3f\n", k, avg_conf, current_thresh))
+    }
   }
-}
-saveRDS(list(summary = stability_summary, details = results_by_k), paste0(prefix, "_all_k_stability_results.rds"))
-
-############################################
-# 6. Select Best K
-############################################
-if (nrow(stability_summary) == 0) stop("Stability summary is empty.")
-
-max_conf <- max(stability_summary$mean_confidence, na.rm = TRUE)
-tolerance <- 0.02 
-candidates <- stability_summary %>% filter(mean_confidence >= (max_conf - tolerance)) %>% arrange(k)
-
-best_k <- candidates$k[1]
-best_thresh <- candidates$threshold_used[1]
-cat(sprintf("\n>>> Best K Selected: %d <<<\n", best_k))
-
-k_key <- as.character(best_k)
-final_res <- results_by_k[[k_key]]
-if (is.null(names(final_res$confidence_score))) names(final_res$confidence_score) <- rownames(final_res$robust_sim)
-
-disease_ids <- rownames(final_res$robust_sim)
-meta_df <- data.frame(Disease = disease_ids, stringsAsFactors = FALSE)
-meta_df$clean_id <- gsub("^finngen_R12_|\\.list$|\\.tsv\\.bgz$", "", meta_df$Disease)
-
-if (!is.null(master_map)) {
-  master_sub <- master_map[!duplicated(master_map$clean_filename), ]
-  meta_df <- merge(meta_df, master_sub, by.x = "clean_id", by.y = "clean_filename", all.x = TRUE)
-  meta_df$Display_Name <- ifelse(!is.na(meta_df$trait) & meta_df$trait != "", meta_df$trait, meta_df$Disease)
-  meta_df$label <- ifelse(!is.na(meta_df$label1) & meta_df$label1 != "", meta_df$label1, "Other")
-  meta_df$label2 <- ifelse(!is.na(meta_df$label2) & meta_df$label2 != "", meta_df$label2, "Unknown")
+  saveRDS(list(summary = stability_summary, details = results_by_k), paste0(prefix, "_all_k_stability_results.rds"))
+  
+  if (nrow(stability_summary) == 0) stop("Stability summary is empty.")
+  
+  max_conf <- max(stability_summary$mean_confidence, na.rm = TRUE)
+  tolerance <- 0.02 
+  candidates <- stability_summary %>% filter(mean_confidence >= (max_conf - tolerance)) %>% arrange(k)
+  
+  best_k <- candidates$k[1]
+  best_thresh <- candidates$threshold_used[1]
+  cat(sprintf("\n>>> Best K Selected: %d <<<\n", best_k))
+  
+  k_key <- as.character(best_k)
+  final_res <- results_by_k[[k_key]]
+  if (is.null(names(final_res$confidence_score))) names(final_res$confidence_score) <- rownames(final_res$robust_sim)
+  
+  disease_ids <- rownames(final_res$robust_sim)
+  meta_df <- data.frame(Disease = disease_ids, stringsAsFactors = FALSE)
+  meta_df$clean_id <- gsub("^finngen_R12_|\\.list$|\\.tsv\\.bgz$", "", meta_df$Disease)
+  
+  if (!is.null(master_map)) {
+    master_sub <- master_map[!duplicated(master_map$clean_filename), ]
+    meta_df <- merge(meta_df, master_sub, by.x = "clean_id", by.y = "clean_filename", all.x = TRUE)
+    meta_df$Display_Name <- ifelse(!is.na(meta_df$trait) & meta_df$trait != "", meta_df$trait, meta_df$Disease)
+    meta_df$label <- ifelse(!is.na(meta_df$label1) & meta_df$label1 != "", meta_df$label1, "Other")
+    meta_df$label2 <- ifelse(!is.na(meta_df$label2) & meta_df$label2 != "", meta_df$label2, "Unknown")
+  } else {
+    meta_df$Display_Name <- meta_df$Disease; meta_df$label <- "Other"; meta_df$label2 <- "Unknown"
+  }
+  
+  col_mean <- "#2E5C8A"; col_best <- "#E6550D"  
+  p_combined <- ggplot(stability_summary, aes(x = k, y = mean_confidence)) +
+    geom_line(color = col_mean, linewidth = 1.5) + geom_point(color = col_mean, size = 5) +
+    geom_vline(xintercept = best_k, color = col_best, linetype = "dashed", linewidth = 1.5) +
+    ggplot2::annotate("text", x = best_k + 0.15, y = min(stability_summary$mean_confidence, na.rm = TRUE), label = paste0("Best K = ", best_k), color = col_best, fontface = "bold", size = 6, hjust = 0, vjust = 0) +
+    scale_x_continuous(breaks = k_range, labels = paste0(" ", k_range, " ")) + theme_classic(base_size = 18) +
+    labs(title = "Optimal K Selection: Bootstrap Mean Confidence", x = "Number of Topics (K)", y = "Bootstrap Mean Confidence Score")
+  ggsave(paste0(prefix, "_K_selection.png"), p_combined, width = 12, height = 7, dpi = 300)
+  
+  write.csv(stability_summary[stability_summary$k == best_k, ], paste0(prefix, "_best_k_selection_info.csv"), row.names = FALSE)
+  
+  scores <- final_res$confidence_score
+  passed_ids <- if (opt$keep_all_traits) names(scores) else names(scores)[scores >= best_thresh]
+  
+  if(length(passed_ids) > 0) {
+    stable_list_df <- meta_df[meta_df$Disease %in% passed_ids, ]
+    stable_list_df$Confidence_Score <- scores[stable_list_df$Disease]
+    cols_to_keep <- c("Disease", "Display_Name", "Confidence_Score", "label", "label2")
+    stable_list_df <- stable_list_df[, cols_to_keep[cols_to_keep %in% colnames(stable_list_df)]]
+    colnames(stable_list_df)[colnames(stable_list_df) == "label"] <- "Category" 
+    colnames(stable_list_df)[colnames(stable_list_df) == "label2"] <- "Source"   
+    write.csv(stable_list_df[order(-stable_list_df$Confidence_Score), ], paste0(prefix, "_stable_diseases_list.csv"), row.names = FALSE)
+    
+    plot_df <- stable_list_df
+    plot_df$Display_Name_Unique <- make.unique(as.character(plot_df$Display_Name))
+    plot_df <- plot_df[order(plot_df$Confidence_Score), ]
+    plot_df$Display_Name_Unique <- factor(plot_df$Display_Name_Unique, levels = plot_df$Display_Name_Unique)
+    
+    custom_colors <- get_network_colors()
+    unique_cats <- unique(plot_df$Category)
+    cols <- setNames(rep(custom_colors, length.out=length(unique_cats)), unique_cats)
+    shapes <- setNames(rep(c(16, 17, 15, 18, 3, 4, 8, 1, 2, 5), length.out=length(unique(plot_df$Source))), unique(plot_df$Source))
+    plot_height <- max(6, nrow(plot_df) * 0.22)
+    
+    p_rank <- ggplot(plot_df, aes(x = Confidence_Score, y = Display_Name_Unique)) +
+      geom_segment(aes(x = 0, xend = Confidence_Score, y = Display_Name_Unique, yend = Display_Name_Unique), color = "grey70", linewidth = 1) +
+      geom_point(aes(color = Category, shape = Source), size = 4) +
+      geom_vline(xintercept = best_thresh, color = "firebrick", linetype = "dashed", linewidth = 1) +
+      ggplot2::annotate("text", x = best_thresh + 0.02, y = 1.5, label = paste0("Threshold (", round(best_thresh, 2), ")"), color = "firebrick", fontface = "bold", hjust = 0, size = 5) +
+      scale_y_discrete(labels = setNames(as.character(plot_df$Display_Name), plot_df$Display_Name_Unique)) +
+      scale_color_manual(values = cols) + scale_shape_manual(values = shapes) +
+      scale_x_continuous(limits = c(0, 1.05), breaks = c(0, 0.25, 0.50, 0.75, 1.00)) +
+      theme_classic(base_size = 14) +
+      theme(
+        axis.text.y = element_text(face = "bold", size = 11, color = "black"), axis.text.x = element_text(size = 12, color = "black"),
+        axis.title.y = element_blank(), axis.title.x = element_text(face = "bold", margin = margin(t = 10)),
+        plot.title = element_text(hjust = 0.5, face = "bold", size = 18, margin = margin(b = 15)),
+        legend.position = "right", legend.title = element_text(face = "bold")
+      ) +
+      labs(title = paste0("Disease Stability (K = ", best_k, " )"), x = "Confidence Score")
+    
+    ggsave(paste0(prefix, "_ranking_best_k", best_k, ".jpg"), p_rank, width = 12, height = plot_height, dpi = 300, limitsize = FALSE)
+  }
+  
 } else {
-  meta_df$Display_Name <- meta_df$Disease; meta_df$label <- "Other"; meta_df$label2 <- "Unknown"
-}
-
-############################################
-# 7. Pre-Plots & Setup
-############################################
-col_mean <- "#2E5C8A"; col_best <- "#E6550D"  
-p_combined <- ggplot(stability_summary, aes(x = k, y = mean_confidence)) +
-  geom_line(color = col_mean, linewidth = 1.5) + geom_point(color = col_mean, size = 5) +
-  geom_vline(xintercept = best_k, color = col_best, linetype = "dashed", linewidth = 1.5) +
-  ggplot2::annotate("text", x = best_k + 0.15, y = min(stability_summary$mean_confidence, na.rm = TRUE), label = paste0("Best K = ", best_k), color = col_best, fontface = "bold", size = 6, hjust = 0, vjust = 0) +
-  scale_x_continuous(breaks = k_range, labels = paste0(" ", k_range, " ")) + theme_classic(base_size = 18) +
-  labs(title = "Optimal K Selection: Bootstrap Mean Confidence", x = "Number of Topics (K)", y = "Bootstrap Mean Confidence Score")
-ggsave(paste0(prefix, "_K_selection.png"), p_combined, width = 12, height = 7, dpi = 300)
-
-write.csv(stability_summary[stability_summary$k == best_k, ], paste0(prefix, "_best_k_selection_info.csv"), row.names = FALSE)
-
-scores <- final_res$confidence_score
-passed_ids <- if (opt$keep_all_traits) names(scores) else names(scores)[scores >= best_thresh]
-
-if(length(passed_ids) > 0) {
-  stable_list_df <- meta_df[meta_df$Disease %in% passed_ids, ]
-  stable_list_df$Confidence_Score <- scores[stable_list_df$Disease]
-  cols_to_keep <- c("Disease", "Display_Name", "Confidence_Score", "label", "label2")
-  stable_list_df <- stable_list_df[, cols_to_keep[cols_to_keep %in% colnames(stable_list_df)]]
-  colnames(stable_list_df)[colnames(stable_list_df) == "label"] <- "Category" 
-  colnames(stable_list_df)[colnames(stable_list_df) == "label2"] <- "Source"   
-  write.csv(stable_list_df[order(-stable_list_df$Confidence_Score), ], paste0(prefix, "_stable_diseases_list.csv"), row.names = FALSE)
+  # =========================================================
+  # Fast Mode：Skip Bootstrap by forcing specific K (--k_only)
+  # =========================================================
+  best_k <- opt$k_only
+  opt$keep_all_traits <- TRUE # 隐式强制保留所有疾病
+  best_thresh <- 0 
   
-  # =========================================================================
-  # NEW CODE: Generate the Lollipop Chart (Ranking Plot) for Stable Diseases
-  # =========================================================================
-  cat("Generating Stability Ranking Plot...\n")
-  plot_df <- stable_list_df
-  # To avoid duplicate names breaking the plot, use make.unique
-  plot_df$Display_Name_Unique <- make.unique(as.character(plot_df$Display_Name))
-  # Sort the dataframe by Confidence Score
-  plot_df <- plot_df[order(plot_df$Confidence_Score), ]
-  # Lock the factor levels so ggplot plots them in the sorted order
-  plot_df$Display_Name_Unique <- factor(plot_df$Display_Name_Unique, levels = plot_df$Display_Name_Unique)
+  cat("\n============================================\n")
+  cat(sprintf("FAST MODE TRIGGERED: Skipping Bootstrapping. Forcing K = %d\n", best_k))
+  cat("============================================\n")
   
-  # Extract colors and shapes matching the network map
-  custom_colors <- get_network_colors()
-  unique_cats <- unique(plot_df$Category)
-  cols <- setNames(rep(custom_colors, length.out=length(unique_cats)), unique_cats)
-  shapes <- setNames(rep(c(16, 17, 15, 18, 3, 4, 8, 1, 2, 5), length.out=length(unique(plot_df$Source))), unique(plot_df$Source))
+  disease_ids <- rownames(input_mat)
   
-  # Set dynamic height based on number of diseases (to prevent squishing)
-  plot_height <- max(6, nrow(plot_df) * 0.22)
+  # 伪造全 1.0 的 Confidence Score 欺骗下游画图，防止报错
+  dummy_conf <- rep(1.0, length(disease_ids))
+  names(dummy_conf) <- disease_ids
+  final_res <- list(confidence_score = dummy_conf)
   
-  p_rank <- ggplot(plot_df, aes(x = Confidence_Score, y = Display_Name_Unique)) +
-    geom_segment(aes(x = 0, xend = Confidence_Score, y = Display_Name_Unique, yend = Display_Name_Unique), color = "grey70", linewidth = 1) +
-    geom_point(aes(color = Category, shape = Source), size = 4) +
-    geom_vline(xintercept = best_thresh, color = "firebrick", linetype = "dashed", linewidth = 1) +
-    ggplot2::annotate("text", x = best_thresh + 0.02, y = 1.5, label = paste0("Threshold (", round(best_thresh, 2), ")"), color = "firebrick", fontface = "bold", hjust = 0, size = 5) +
-    scale_y_discrete(labels = setNames(as.character(plot_df$Display_Name), plot_df$Display_Name_Unique)) +
-    scale_color_manual(values = cols) +
-    scale_shape_manual(values = shapes) +
-    scale_x_continuous(limits = c(0, 1.05), breaks = c(0, 0.25, 0.50, 0.75, 1.00)) +
-    theme_classic(base_size = 14) +
-    theme(
-      axis.text.y = element_text(face = "bold", size = 11, color = "black"),
-      axis.text.x = element_text(size = 12, color = "black"),
-      axis.title.y = element_blank(),
-      axis.title.x = element_text(face = "bold", margin = margin(t = 10)),
-      plot.title = element_text(hjust = 0.5, face = "bold", size = 18, margin = margin(b = 15)),
-      legend.position = "right",
-      legend.title = element_text(face = "bold")
-    ) +
-    labs(title = paste0("Disease Stability (K = ", best_k, " )"), x = "Confidence Score")
+  # 解析映射表以获取下游需要的 meta_df 格式
+  meta_df <- data.frame(Disease = disease_ids, stringsAsFactors = FALSE)
+  meta_df$clean_id <- gsub("^finngen_R12_|\\.list$|\\.tsv\\.bgz$", "", meta_df$Disease)
   
-  ggsave(paste0(prefix, "_ranking_best_k", best_k, ".jpg"), p_rank, width = 12, height = plot_height, dpi = 300, limitsize = FALSE)
-  # =========================================================================
-}
-
-visualize_robust_network <- function(sim_matrix, meta_data, confidence_scores, threshold, stability_threshold, title) {
-  valid_nodes <- intersect(names(confidence_scores)[confidence_scores >= stability_threshold], rownames(sim_matrix))
-  if (length(valid_nodes) < 2) return(NULL)
-  adj <- sim_matrix[valid_nodes, valid_nodes]; adj[adj < threshold] <- 0; diag(adj) <- 0
-  g <- graph_from_adjacency_matrix(adj, mode = "undirected", weighted = TRUE)
-  if (vcount(g) == 0) return(NULL)
-  
-  node_names <- V(g)$name; idx <- match(node_names, meta_data$Disease)
-  V(g)$display_name <- meta_data$Display_Name[idx]
-  V(g)$group <- meta_data$label[idx]; V(g)$source <- meta_data$label2[idx]; V(g)$conf <- confidence_scores[node_names]
-  
-  set.seed(opt$seed); layout <- layout_with_fr(g)
-  node_pos <- data.frame(x = layout[,1], y = layout[,2], name = node_names, label_show = V(g)$display_name, group = V(g)$group, source = V(g)$source, conf = V(g)$conf, stringsAsFactors = FALSE)
-  
-  edges <- as.data.frame(get.edgelist(g)); edges_df <- data.frame()
-  if(nrow(edges) > 0) {
-    colnames(edges) <- c("from", "to"); edges$weight <- E(g)$weight
-    edges_df <- merge(merge(edges, node_pos, by.x="from", by.y="name"), node_pos, by.x="to", by.y="name", suffixes=c(".from", ".to"))
+  if (!is.null(master_map)) {
+    master_sub <- master_map[!duplicated(master_map$clean_filename), ]
+    meta_df <- merge(meta_df, master_sub, by.x = "clean_id", by.y = "clean_filename", all.x = TRUE)
+    meta_df$Display_Name <- ifelse(!is.na(meta_df$trait) & meta_df$trait != "", meta_df$trait, meta_df$Disease)
+    meta_df$label <- ifelse(!is.na(meta_df$label1) & meta_df$label1 != "", meta_df$label1, "Other")
+    meta_df$label2 <- ifelse(!is.na(meta_df$label2) & meta_df$label2 != "", meta_df$label2, "Unknown")
+  } else {
+    meta_df$Display_Name <- meta_df$Disease; meta_df$label <- "Other"; meta_df$label2 <- "Unknown"
   }
-  
-  custom_colors <- get_network_colors(); unique_grps <- unique(node_pos$group)
-  cols <- setNames(rep(custom_colors, length.out=length(unique_grps)), unique_grps)
-  shapes <- setNames(rep(c(16, 17, 15, 18, 3, 4, 8, 1, 2, 5), length.out=length(unique(node_pos$source))), unique(node_pos$source))
-  
-  p <- ggplot() +
-    {if(nrow(edges_df)>0) geom_segment(data=edges_df, aes(x=x.from, y=y.from, xend=x.to, yend=y.to, alpha=weight), color="grey60", linewidth=0.5)} +
-    geom_point(data=node_pos, aes(x=x, y=y, color=group, shape=source, size=conf), alpha=0.9) +
-    geom_text_repel(data=node_pos, aes(x=x, y=y, label=label_show), size=6, fontface = "bold", bg.color="white", bg.r=0.15, max.overlaps=50) +
-    scale_alpha(range=c(0.2, 0.6), guide="none") + scale_size(range=c(4, 10), name="Bootstrap Stability") + 
-    scale_color_manual(values=cols, name="Disease Category") + scale_shape_manual(values=shapes, name="Data Source") + theme_void() +
-    theme(legend.position = "right", legend.title = element_text(face="bold", size=16), legend.text = element_text(size=14), plot.title = element_text(hjust=0.5, face="bold", size=22)) +
-    labs(title = title, subtitle = paste("Stability >", round(stability_threshold, 3), "| Edge Sim >", threshold))
-  return(p)
 }
-
-applied_stability_thresh <- if (opt$keep_all_traits) -Inf else best_thresh
-edge_thresh <- ifelse(opt$mode == "gene", 0.47, 0.70)
-p_net <- visualize_robust_network(final_res$robust_sim, meta_df, final_res$confidence_score, edge_thresh, applied_stability_thresh, paste("Robust Network (K =", best_k, ")"))
-if (!is.null(p_net)) ggsave(paste0(prefix, "_robust_network_best_k", best_k, ".png"), p_net, width = 18, height = 13, dpi = 300)
-
 
 ############################################################################
 #        PART 2: Downstream Analysis Dispatch                              #

@@ -25,8 +25,8 @@ run_downstream_ss_lda <- function(input_mat, final_res, meta_df, best_k, best_th
   cat(sprintf(">> Filtered SS Matrix Dimensions: %d Diseases x %d Diseases (Words)\n", nrow(matrix_result), ncol(matrix_result)))
 
   # Run SNPic (LDA)
-  set.seed(seed)
-  results_umap_pca <- plot_umap_pca_from_matrix(matrix_result, prefix_downstream, master_map)
+  # set.seed(seed)
+  # results_umap_pca <- plot_umap_pca_from_matrix(matrix_result, prefix_downstream, master_map)
   set.seed(seed)
   results_snpic <- run_lda_analysis(matrix_result, k = k_topic, prefix = prefix_downstream, master_map = master_map)
   

@@ -69,7 +69,7 @@ run_mixed_membership <- function(matrix_result, k = 5, custom_order = NULL, mast
          x = "Topic Probability", y = "Disease") +
     theme(axis.text.y = element_text(size = 14),
           legend.position = "right")
-  print(gg1)
+  # print(gg1)
   
   # Step 5: MaxTopic 处理和第二个图
   df_topics$MaxTopic <- apply(topics_matrix, 1, which.max)
@@ -121,7 +121,7 @@ run_mixed_membership <- function(matrix_result, k = 5, custom_order = NULL, mast
       )
   }
   
-  print(gg2)
+  # print(gg2)
   topic_matrix2 <- as.data.frame(topics_matrix)
   topic_matrix2$Disease <- rownames(topics_matrix)
   topic_matrix2 <- resolve_labels(topic_matrix2, master_map)
@@ -242,11 +242,11 @@ plot_umap_topics <- function(topic_matrix,
       legend.position = "right",
       plot.title = element_text(hjust = 0.5)
     )
-  print(p_snpic_umap)
-  # optional: save plot
-  if (!is.null(prefix)) {
-    ggsave(paste0(prefix, "_SSword_snpic_umap.png"), p_snpic_umap, width = 10, height = 8)
-  }
+  # print(p_snpic_umap)
+  # # optional: save plot
+  # if (!is.null(prefix)) {
+  #   ggsave(paste0(prefix, "_SSword_snpic_umap.png"), p_snpic_umap, width = 10, height = 8)
+  # }
   return(umap_df)
 }
 
@@ -288,9 +288,9 @@ plot_pca_topics <- function(topic_matrix, prefix = NULL, master_map = NULL) {
         NULL
       }
     )
-  print(p_snpic_pca)
-  if (!is.null(prefix)) {
-    ggsave(paste0(prefix, "_SSword_snpic_pca.png"), p_snpic_pca, width = 10, height = 8)
-  }
+  # print(p_snpic_pca)
+  # if (!is.null(prefix)) {
+  #   ggsave(paste0(prefix, "_SSword_snpic_pca.png"), p_snpic_pca, width = 10, height = 8)
+  # }
   return(list(pca_df = df_pca, pca_obj = pca))
 }

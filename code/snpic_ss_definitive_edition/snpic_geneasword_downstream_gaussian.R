@@ -24,8 +24,8 @@ run_downstream_gaussian <- function(input_mat, final_res, meta_df, best_k, best_
   dtm_scaled <- as.data.frame(t(scale(t(matrix_result))))
   dtm_scaled <- dtm_scaled - min(dtm_scaled) 
 
-  set.seed(seed)
-  results_umap_pca_gaussian <- plot_umap_pca_from_matrix(shared_snp_matrix = dtm_scaled, prefix = prefix_gaussian, master_map = master_map)
+  #set.seed(seed)
+  #results_umap_pca_gaussian <- plot_umap_pca_from_matrix(shared_snp_matrix = dtm_scaled, prefix = prefix_gaussian, master_map = master_map)
   set.seed(seed)
   out_gaussian <- run_mixed_membership(matrix_result, k = k_topic, master_map = master_map)
   gaussian_topic_matrix_std <- out_gaussian$topic_matrix2
@@ -41,14 +41,14 @@ run_downstream_gaussian <- function(input_mat, final_res, meta_df, best_k, best_
     return(p)
   }
 
-  ggsave(paste0(prefix_gaussian, "_pca.png"), create_dim_plot(results_umap_pca_gaussian$pca_df, "PC1", "PC2", "PCA (Gaussian Model)", "PC1", "PC2"), width=14, height=8, dpi=300)
-  ggsave(paste0(prefix_gaussian, "_umap.png"), create_dim_plot(results_umap_pca_gaussian$umap_df, "UMAP1", "UMAP2", "UMAP (Gaussian Model)", "UMAP1", "UMAP2"), width=14, height=8, dpi=300)
+  #ggsave(paste0(prefix_gaussian, "_pca.png"), create_dim_plot(results_umap_pca_gaussian$pca_df, "PC1", "PC2", "PCA (Gaussian Model)", "PC1", "PC2"), width=14, height=8, dpi=300)
+  #ggsave(paste0(prefix_gaussian, "_umap.png"), create_dim_plot(results_umap_pca_gaussian$umap_df, "UMAP1", "UMAP2", "UMAP (Gaussian Model)", "UMAP1", "UMAP2"), width=14, height=8, dpi=300)
 
   # Similarity Analysis
   if(!"label2" %in% colnames(gaussian_topic_matrix_std)) gaussian_topic_matrix_std$label2 <- gaussian_topic_matrix_std$label
   sim_res_gaussian <- analyze_disease_similarity(gaussian_topic_matrix_std, model_type = "Gaussian", mode = "separate", edge_threshold = 0.70, seed = seed)
   if(!is.null(sim_res_gaussian$correlation_plots$network)) ggsave(paste0(prefix_gaussian, "_similarity_network.png"), sim_res_gaussian$correlation_plots$network, width=14, height=10)
-  if(!is.null(sim_res_gaussian$correlation_plots$heatmap)) ggsave(paste0(prefix_gaussian, "_similarity_heatmap.png"), sim_res_gaussian$correlation_plots$heatmap, width=14, height=10)
+  #if(!is.null(sim_res_gaussian$correlation_plots$heatmap)) ggsave(paste0(prefix_gaussian, "_similarity_heatmap.png"), sim_res_gaussian$correlation_plots$heatmap, width=14, height=10)
 
   # ==========================================
   # 【核心修改区 1】：Topic Distributions 画图函数

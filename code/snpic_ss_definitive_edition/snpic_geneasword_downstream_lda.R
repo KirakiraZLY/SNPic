@@ -21,8 +21,8 @@ run_downstream_lda <- function(input_mat, final_res, meta_df, best_k, best_thres
   matrix_result <- matrix_result[, apply(matrix_result, 2, function(x) length(unique(x)) > 1), drop = FALSE]
 
   # Normal LDA Execution
-  set.seed(seed)
-  results_umap_pca <- plot_umap_pca_from_matrix(shared_snp_matrix = matrix_result, prefix = prefix_downstream, master_map = master_map)
+  #set.seed(seed)
+  #results_umap_pca <- plot_umap_pca_from_matrix(shared_snp_matrix = matrix_result, prefix = prefix_downstream, master_map = master_map)
   set.seed(seed)
   results_snpic <- run_lda_analysis(matrix_result, k = k_topic, prefix = prefix_downstream, master_map = master_map)
 
@@ -40,14 +40,14 @@ run_downstream_lda <- function(input_mat, final_res, meta_df, best_k, best_thres
     return(p)
   }
 
-  ggsave(paste0(prefix_downstream, "_pca.png"), create_dim_plot(results_umap_pca$pca_df, "PC1", "PC2", "PCA (LDA Model)", "PC1", "PC2"), width=14, height=8, dpi=300)
-  ggsave(paste0(prefix_downstream, "_umap.png"), create_dim_plot(results_umap_pca$umap_df, "UMAP1", "UMAP2", "UMAP (LDA Model)", "UMAP1", "UMAP2"), width=14, height=8, dpi=300)
+  #ggsave(paste0(prefix_downstream, "_pca.png"), create_dim_plot(results_umap_pca$pca_df, "PC1", "PC2", "PCA (LDA Model)", "PC1", "PC2"), width=14, height=8, dpi=300)
+  #ggsave(paste0(prefix_downstream, "_umap.png"), create_dim_plot(results_umap_pca$umap_df, "UMAP1", "UMAP2", "UMAP (LDA Model)", "UMAP1", "UMAP2"), width=14, height=8, dpi=300)
 
   # Similarity Analysis
   if(!"label2" %in% colnames(snpic_topic_matrix)) snpic_topic_matrix$label2 <- snpic_topic_matrix$label
   sim_res_lda <- analyze_disease_similarity(snpic_topic_matrix, model_type = "LDA", mode = "separate", edge_threshold = 0.70, seed = seed)
   if(!is.null(sim_res_lda$correlation_plots$network)) ggsave(paste0(prefix_downstream, "_similarity_network.png"), sim_res_lda$correlation_plots$network, width=14, height=10)
-  if(!is.null(sim_res_lda$correlation_plots$heatmap)) ggsave(paste0(prefix_downstream, "_similarity_heatmap.png"), sim_res_lda$correlation_plots$heatmap, width=14, height=10)
+  #if(!is.null(sim_res_lda$correlation_plots$heatmap)) ggsave(paste0(prefix_downstream, "_similarity_heatmap.png"), sim_res_lda$correlation_plots$heatmap, width=14, height=10)
 
   # ==========================================
   # 【核心修改区】：Topic Distributions 画图函数

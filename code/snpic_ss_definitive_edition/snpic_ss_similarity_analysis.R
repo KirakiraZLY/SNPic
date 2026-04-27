@@ -315,8 +315,8 @@ analyze_disease_similarity <- function(topic_matrix, methods = c("hellinger", "c
     sim <- calculate_disease_similarity(topic_numeric, method)
     results[[method]] <- sim
     
-    message(paste("Visualizing results for", method, "..."))
-    heatmap <- visualize_topic_heatmap(topic_numeric, disease_labels, model_type, method)
+    # message(paste("Visualizing results for", method, "..."))
+    # heatmap <- visualize_topic_heatmap(topic_numeric, disease_labels, model_type, method)
     
     if(mode == "shape_only") {
       network <- visualize_network_shape_only(sim, disease_labels, model_type, method, topic_matrix, 
@@ -337,7 +337,7 @@ analyze_disease_similarity <- function(topic_matrix, methods = c("hellinger", "c
       }
     }
     
-    print(heatmap)
+    # print(heatmap)
     print(network)
     results[[paste0(method, "_plots")]] <- list(heatmap = heatmap, network = network)
   }

@@ -201,7 +201,7 @@ categorical-20001-both_sexes-1023.list,rectal cancer,Cancer,UKBB
 categorical-20001-both_sexes-1052.list,hodgkins lymphoma,Cancer,UKBB
 categorical-20002-both_sexes-1222.list,type 1 diabetes,Immuno,UKBB
 categorical-20002-both_sexes-1382.list,sjogren's syndrome/sicca syndrome,Immuno,UKBB
-categorical-20002-both_sexes-1466.list,gout,MC,UKBB
+categorical-20002-both_sexes-1466.list,Gout,MC,UKBB
 categorical-20002-both_sexes-1470.list,Anorexia Nervosa,Psy,UKBB
 categorical-20544-both_sexes-14.list,Autism spectrum disorder,Psy,UKBB
 categorical-20544-both_sexes-15.list,Anxiety,Psy,UKBB
