@@ -150,8 +150,8 @@ Rscript run_snpic.R --help
 ```
 ### Key Routing Parameters:
 * `--mode`: Choose your base matrix construction. Options: `"gene"` (Gene-as-word) or `"ss"` (Sumstat-as-word). **Default: `"gene"`**
-* `--model`: Choose the downstream probabilistic algorithm. Options: `"lda"`, `"gaussian"`, or `"both"`. **Default: `"lda"`**   
-* 💡 Pro Tip: Add the `--keep_all_traits` flag (no arguments needed) to skip the stability threshold filter and keep all traits for downstream analysis and network plotting. **Default: filter out unstable traits.**
+* `--model`: Choose the downstream probabilistic algorithm. Options: `"lda"`, `"gaussian"`, or `"both"`. **Default: `"lda"`** * 💡 **Pro Tip (Keep All):** Add the `--keep_all_traits` flag (no arguments needed) to skip the stability threshold filter and keep all traits for downstream analysis and network plotting. **Default: filter out unstable traits.**
+* ⚡ **Pro Tip (Fast Mode):** Use `--k_only <integer>` to bypass the time-consuming bootstrapping step and run the analysis exactly once with the specified number of topics. This is highly recommended for quick testing or when you already know your optimal $K$. *(Note: using `--k_only` automatically implies `--keep_all_traits`).*
 
 ### Example A: Gene-as-word (LDA)
 ***Note 1*:** `--snp_gene_map` is strictly required when using `--mode "gene"`.   
@@ -187,6 +187,18 @@ Rscript run_snpic.R \
   --model "both" \
   --keep_all_traits
 ```
+
+### Example C: FAST MODE (Bypass Bootstrap) ⚡
+***Note:*** Use this if you already know your optimal K (e.g., K=12) and just want to generate the downstream plots immediately without waiting for the bootstrap stability calculations.
+```bash
+Rscript run_snpic.R \
+  --input_folder "<YOUR_CUSTOM_PATH>/" \
+  --snp_gene_map "<YOUR_CUSTOM_PATH>/snp_gene_map_merged_finngen_ukbb.txt" \
+  --master_map "<YOUR_CUSTOM_PATH>/master_disease_mapping.csv" \
+  --out_prefix "<YOUR_CUSTOM_PATH>/fast_test_k12" \
+  --k_only 12 \
+  --mode "gene" \
+  --model "lda"
 
 ### 🛠️ Data Preparation: SNP-to-Gene Mapping
 
@@ -245,7 +257,7 @@ Rscript ./run_snpic.R \
 ### 📊 Expected Outputs
 Upon successful execution, the specified out_prefix directory will contain:
 
-> 1. Model Selection & Stability: Dual-axis K-selection plots and bootstrap stability evaluation matrices.
+> 1. Model Selection & Stability: Dual-axis K-selection plots and bootstrap stability evaluation matrices. *(Note: These are skipped if using `--k_only`)*
 > 2. Topic distribution and Top-gene per topic.
 > 3. Similarity Networks: Thresholded network graphs highlighting shared genetic architectures among traits.
 > 4. Downstream Annotations:
