@@ -256,6 +256,7 @@ Upon successful execution, the specified out_prefix directory will contain:
 ## 🎒 Our paper
 Our new preprint "SNPic" is officially live on bioRxiv!  
 DOI: [https://doi.org/10.64898/2026.04.22.720106](https://doi.org/10.64898/2026.04.22.720106)   
+LinkedIn post: [LinkedIn](https://www.linkedin.com/posts/zhang-leyi-%E5%BC%A0%E4%B9%90%E8%89%BA-8010a9214_snpic-gwas-topicmodeling-activity-7454387884368932864--AK6?utm_source=share&utm_medium=member_desktop&rcm=ACoAADYea0EBp7O02REtJW0m2wO_YAdvxND0Fcg)    
 Enjoy reading it, and feel free to drop your brutal feedback! 😈😈😈
 ![SNPic description](./figure/fig1_graphical_abstract.png)
 
