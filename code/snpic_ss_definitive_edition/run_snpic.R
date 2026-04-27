@@ -310,7 +310,7 @@ if (is.null(opt$k_only)) {
   
 } else {
   # =========================================================
-  # Fast Mode：Skip Bootstrap by forcing specific K (--k_only)
+  # Fast Mode
   # =========================================================
   best_k <- opt$k_only
   opt$keep_all_traits <- TRUE # 隐式强制保留所有疾病
