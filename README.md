@@ -199,6 +199,7 @@ Rscript run_snpic.R \
   --k_only 12 \
   --mode "gene" \
   --model "lda"
+```
 
 ### 🛠️ Data Preparation: SNP-to-Gene Mapping
 
