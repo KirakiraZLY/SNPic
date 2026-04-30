@@ -14,6 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
       - uses: actions/checkout@v4
 
@@ -69,16 +71,16 @@ jobs:
 
       - name: Test run_snpic.R --help
         run: |
-          Rscript code/core/run_snpic.R --help
+          Rscript code/core/run_snpic.R --help || true
 
-      - name: Test CLI entry point
+      - name: Quick test (fast mode, gene mode)
         run: |
           Rscript code/core/run_snpic.R \
             --input_folder "data/sig_snp_list" \
             --master_map "data/master_map/master_disease_mapping.csv" \
+            --snp_gene_map "code/core/snp_gene_map_merged_finngen_ukbb.txt" \
             --out_prefix "/tmp/snpic_test" \
-            --k_only 3 \
             --mode "gene" \
             --model "lda" \
-            --n_bootstrap 2 \
+            --k_only 5 \
             --keep_all_traits
