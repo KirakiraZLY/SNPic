@@ -1,0 +1,53 @@
+﻿# R History
+.Rhistory
+.Rapp.history
+
+# R Data
+.RData
+*.RData
+*.Rds
+*.rds
+
+# R Environment
+.Renviron
+.Rprofile
+
+# RStudio
+.Rproj.user/
+*.Rproj
+.Rproj.user
+
+# Output files
+results/
+*.log
+*.aux
+*.out
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# PDFs (generated figures)
+*.pdf
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+.snpic_venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Large data files (keep track via git lfs or external)
+*.bam
+*.bai
+*.vcf
+*.vcf.gz

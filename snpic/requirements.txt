@@ -1,0 +1,6 @@
+# SNPic Python wrapper dependencies
+# Core functionality requires only the Python standard library.
+# No additional packages needed for basic usage.
+#
+# For development & testing:
+# pytest>=7.0

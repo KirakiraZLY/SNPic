@@ -4,23 +4,87 @@ We present SNPic, a probabilistic framework that redefines the analytical landsc
 
 ---
 
+## 📖 Citation
+
+If you use SNPic in your research, please cite our paper:
+
+> Zhang L. et al. (2026). *SNPic: SNP Topic Modeling for Interpretable Clustering of Complex Phenotypes*. bioRxiv. DOI: [10.64898/2026.04.22.720106](https://doi.org/10.64898/2026.04.22.720106)
+
+```bib
+@article{zhang2026snpic,
+  title={SNPic: SNP Topic Modeling for Interpretable Clustering of Complex Phenotypes},
+  author={Zhang, Leyi and [Other Authors]},
+  journal={bioRxiv},
+  year={2026},
+  doi={10.64898/2026.04.22.720106}
+}
+```
+
+---
+
 ## 📂 Repository Structure
 
-The core analysis pipeline has been highly modularized into a unified dispatcher architecture:
+```
+SNPic/
+├── snpic/                          # Python wrapper & CLI
+│   ├── __init__.py
+│   ├── cli.py
+│   └── requirements.txt
+├── code/
+│   ├── core/                       # Core SNPic R pipeline
+│   │   ├── run_snpic.R             #   Main CLI dispatcher
+│   │   ├── LDA_for_snpic_ss.R      #   LDA topic model
+│   │   ├── mixed_membership_topics.R  # Gaussian mixed-membership
+│   │   ├── snpic_ss_dependency.R   #   Environment setup
+│   │   ├── snpic_geneasword_downstream_lda.R
+│   │   ├── snpic_geneasword_downstream_gaussian.R
+│   │   ├── snpic_sumstat_asword_downstream_lda.R
+│   │   ├── snpic_sumstat_asword_downstream_gaussian.R
+│   │   ├── snpic_ss_similarity_analysis.R
+│   │   ├── snpic_ss_pathway_enrichment_analysis.R
+│   │   ├── snpic_ss_human_protein_analysis.R
+│   │   ├── snpic_ss_ground_truth_comparison.R
+│   │   └── snp_gene_map_merged_finngen_ukbb.txt
+│   └── utils/                      # Utility scripts
+│       ├── gene_noncoding_remove.R
+│       └── run_v2f_gtex_union_mapping.R
+├── data/
+│   ├── master_map/                 # Trait meta-information CSVs
+│   │   ├── master_disease_mapping.csv
+│   │   └── master_disease_mapping_detail.csv
+│   └── sig_snp_list/               # Demo GWAS SNP lists
+├── environment/
+│   ├── Dockerfile
+│   └── postInstall
+├── figure/                         # Output figures
+├── .github/workflows/
+│   └── r-cmd-check.yml             # CI: R CMD check
+├── .gitignore
+├── CITATION.cff
+├── environment.yml
+├── LICENSE
+├── README.md
+└── run                              # Docker capsule entrypoint
+```
 
-* `run_snpic.R`: The **MAIN CODE** (CLI script) for running the SNPic pipeline. It dispatches tasks based on your chosen algorithm and matrix mode.   
-* `snpic_ss_dependency.R`: Manages environment setup and dynamically loads all necessary sub-modules.   
-* **Downstream Dispatchers:**   
-  * `snpic_geneasword_downstream_lda.R` & `snpic_geneasword_downstream_gaussian.R`: Handles pathway, tissue, and network analyses for the **Gene-as-Word** mode.
-  * `snpic_sumstat_asword_downstream_lda.R` & `snpic_sumstat_asword_downstream_gaussian.R`: Handles network and topic-trait mappings for the **Sumstat-as-Word** mode.
-* **Core Models**:
-  * `LDA_for_snpic_ss.R`: Implements the Latent Dirichlet Allocation (LDA) based SNPic model.
-  * `mixed_membership_topics.R`: Implements the Gaussian Mixed-Membership Topic Model.
-* **Downstream Analysis**:
-  * `snpic_ss_similarity_analysis.R`: Calculates and visualizes disease similarities and network graphs.
-  * `snpic_ss_pathway_enrichment_analysis.R`: Performs GO/KEGG pathway enrichment on genetic topics.
-  * `snpic_ss_human_protein_analysis.R`: Analyzes tissue-specific expression using GTEx API.
-  * `snpic_ss_ground_truth_comparison.R`: Evaluates the model against ground-truth benchmarks in simulated genotypes from LDAK.
+### Pipeline Architecture
+
+The core analysis pipeline uses a unified dispatcher architecture:
+
+* **`code/core/run_snpic.R`**: The **MAIN CLI script**. Dispatches tasks based on chosen algorithm and matrix mode.
+* **`code/core/snpic_ss_dependency.R`**: Manages environment setup and dynamically loads all sub-modules.
+* **Downstream Dispatchers:**
+  * `snpic_geneasword_downstream_lda.R` & `snpic_geneasword_downstream_gaussian.R`: Pathway, tissue & network analysis for **Gene-as-Word** mode.
+  * `snpic_sumstat_asword_downstream_lda.R` & `snpic_sumstat_asword_downstream_gaussian.R`: Network & topic-trait mappings for **Sumstat-as-Word** mode.
+* **Core Models:**
+  * `LDA_for_snpic_ss.R`: Latent Dirichlet Allocation (LDA) based SNPic model.
+  * `mixed_membership_topics.R`: Gaussian Mixed-Membership Topic Model.
+* **Downstream Analysis:**
+  * `snpic_ss_similarity_analysis.R`: Disease similarity networks.
+  * `snpic_ss_pathway_enrichment_analysis.R`: GO/KEGG pathway enrichment.
+  * `snpic_ss_human_protein_analysis.R`: GTEx tissue-specific expression.
+  * `snpic_ss_ground_truth_comparison.R`: Ground-truth benchmarks (LDAK simulations).
+* **`snpic/` (Python wrapper):** Programmatic API to run SNPic from Python. Requires R >= 4.5.
 
 ---
 
@@ -265,6 +329,48 @@ Upon successful execution, the specified out_prefix directory will contain:
 > > + GO/KEGG pathway enrichment dot plots and detailed table.
 > > + Topic-Tissue expression associations mapped via GTEx.
 
+
+## 🐍 Python Wrapper
+
+SNPic now includes a Python wrapper for programmatic access:
+
+### Installation
+```bash
+pip install -e .  # from repo root, or just use the snpic/ directory directly
+```
+
+### CLI Usage
+```bash
+# Equivalent to the Rscript command below
+python -m snpic.cli \
+  --input_folder "./data/sig_snp_list/" \
+  --master_map "./data/master_map/master_disease_mapping.csv" \
+  --out_prefix "./results/snpic_python_run" \
+  --k_only 12 \
+  --mode "gene" \
+  --model "lda"
+```
+
+### Python API
+```python
+from snpic import SNPicConfig, run_snpic
+
+config = SNPicConfig(
+    input_folder="./data/sig_snp_list/",
+    master_map="./data/master_map/master_disease_mapping.csv",
+    out_prefix="./results/my_analysis",
+    snp_gene_map="./data/snp_gene_map_merged_finngen_ukbb.txt",
+    mode="gene",
+    model="lda",
+    k_only=12,
+)
+result = run_snpic(config)
+print(f"SNPic completed with exit code: {result.returncode}")
+```
+
+*Note:* The Python wrapper requires R >= 4.5 to be installed on your system.
+
+---
 
 ## 🎒 Our paper
 Our new preprint "SNPic" is officially live on bioRxiv!  

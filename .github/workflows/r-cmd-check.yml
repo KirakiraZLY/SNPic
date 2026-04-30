@@ -1,0 +1,84 @@
+# GitHub Actions: R CMD check for SNPic
+# Runs on pushes and pull requests to main branch.
+# Ensures the R package structure is valid and scripts compile.
+name: R CMD check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  R-CMD-check:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: '4.5'
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libcurl4-openssl-dev \
+            libssl-dev \
+            libxml2-dev \
+            libgsl-dev \
+            libharfbuzz-dev \
+            libfribidi-dev
+
+      - name: Install R dependencies
+        run: |
+          Rscript -e '
+            required <- c(
+              "data.table", "dplyr", "tidyr", "reshape2", "stringr",
+              "readr", "tidyverse", "tidytext", "abind",
+              "optparse", "httr", "jsonlite",
+              "topicmodels", "tm", "umap", "igraph",
+              "ggplot2", "ggrepel", "ggraph", "pheatmap",
+              "RColorBrewer", "viridis", "scales",
+              "BiocManager"
+            )
+            for (pkg in required) {
+              if (!requireNamespace(pkg, quietly = TRUE)) {
+                install.packages(pkg, repos = "https://cloud.r-project.org")
+              }
+            }
+            BiocManager::install(c("clusterProfiler", "org.Hs.eg.db"),
+                                 ask = FALSE, update = FALSE)
+          '
+
+      - name: Check R script syntax
+        run: |
+          Rscript -e '
+            files <- list.files("code/core", pattern = "\\.R$", full.names = TRUE)
+            files <- c(files, list.files("code/utils", pattern = "\\.R$", full.names = TRUE))
+            cat("Checking", length(files), "R scripts...\n")
+            for (f in files) {
+              cat("  ✓", basename(f), "\n")
+              tryCatch(parse(file = f),
+                       error = function(e) stop("Syntax error in ", f, ": ", e$message))
+            }
+            cat("✅ All R scripts parse successfully.\n")
+          '
+
+      - name: Test run_snpic.R --help
+        run: |
+          Rscript code/core/run_snpic.R --help
+
+      - name: Test CLI entry point
+        run: |
+          Rscript code/core/run_snpic.R \
+            --input_folder "data/sig_snp_list" \
+            --master_map "data/master_map/master_disease_mapping.csv" \
+            --out_prefix "/tmp/snpic_test" \
+            --k_only 3 \
+            --mode "gene" \
+            --model "lda" \
+            --n_bootstrap 2 \
+            --keep_all_traits

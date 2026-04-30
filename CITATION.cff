@@ -1,0 +1,34 @@
+cff-version: 1.2.0
+message: "If you use SNPic in your research, please cite this paper."
+title: "SNPic: SNP Topic Modeling for Interpretable Clustering of Complex Phenotypes"
+authors:
+  - given-names: Leyi
+    family-names: Zhang
+    email: leyi.zhang@uzh.ch
+    orcid: https://orcid.org/0000-0000-0000-0000
+    affiliation: "University Hospital Zurich, University of Zurich"
+  - given-names: [Other Authors]
+    family-names: ""
+    affiliation: "University Hospital Zurich, University of Zurich"
+identifiers:
+  - type: doi
+    value: "10.64898/2026.04.22.720106"
+    description: "bioRxiv preprint"
+  - type: url
+    value: "https://doi.org/10.64898/2026.04.22.720106"
+    description: "Published paper"
+  - type: url
+    value: "https://github.com/KirakiraZLY/SNPic"
+    description: "GitHub repository"
+repository-code: "https://github.com/KirakiraZLY/SNPic"
+license: "MIT"
+type: software
+keywords:
+  - "GWAS"
+  - "topic modeling"
+  - "LDA"
+  - "genetics"
+  - "NLP"
+  - "bioinformatics"
+  - "pleiotropy"
+date-released: 2026-04-30
