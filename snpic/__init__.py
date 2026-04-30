@@ -6,6 +6,6 @@ to run SNPic analyses and parse results.
 """
 
 __version__ = "0.1.0"
-__author__ = "Leyi Zhang"
+__author__ = "Zhang Leyi"
 
 from .cli import run_snpic, SNPicConfig

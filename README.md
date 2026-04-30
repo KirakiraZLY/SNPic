@@ -8,12 +8,12 @@ We present SNPic, a probabilistic framework that redefines the analytical landsc
 
 If you use SNPic in your research, please cite our paper:
 
-> Zhang L. et al. (2026). *SNPic: SNP Topic Modeling for Interpretable Clustering of Complex Phenotypes*. bioRxiv. DOI: [10.64898/2026.04.22.720106](https://doi.org/10.64898/2026.04.22.720106)
+> Leyi Z., Seiler C., Speed D., Micheroli R., Ospelt C. et al. (2026). *SNPic: SNP Topic Modeling for Interpretable Clustering of Complex Phenotypes*. bioRxiv. DOI: [10.64898/2026.04.22.720106](https://doi.org/10.64898/2026.04.22.720106)
 
 ```bib
 @article{zhang2026snpic,
   title={SNPic: SNP Topic Modeling for Interpretable Clustering of Complex Phenotypes},
-  author={Zhang, Leyi and [Other Authors]},
+  author={Zhang Leyi and Christof Seiler and Doug Speed and Raphael Micheroli and Caroline Ospelt},
   journal={bioRxiv},
   year={2026},
   doi={10.64898/2026.04.22.720106}
@@ -153,7 +153,7 @@ If you encounter C++ compilation errors when installing `clusterProfiler` native
 
 ## 📊 Input Data Specifications 
 
-While we provide demo data to help you get started quickly, **we highly encourage you to apply SNPic to your own custom datasets!** You can always open the files in our `data/`  and `data/` `code/snpic_ss_definitive_edition/` directory to inspect the exact formatting. 
+While we provide demo data to help you get started quickly, **we highly encourage you to apply SNPic to your own custom datasets!** You can always open the files in our `data/`  and `data/` `code/core/` directory to inspect the exact formatting. 
 
 To run your own analysis, you need to prepare three main types of input files:
 
@@ -273,7 +273,7 @@ If you are using the **Gene-as-Word** approach, you must first prepare a SNP-to-
 We provide a fully processed, deduplicated, and protein-coding-filtered mapping file directly within this repository. This file contains approximately **400,000 SNPs** representing the intersection of the FinnGen and UK Biobank (UKBB) cohorts, strictly mapped to GTEx protein-coding regions. 
 
 You can directly reference this file via the `--snp_gene_map` argument:
-`./SNPic/code/snpic_ss_definitive_edition/snp_gene_map_merged_finngen_ukbb.txt`
+`./SNPic/code/core/snp_gene_map_merged_finngen_ukbb.txt`
 
 #### Option B: Download via Google Drive
 If you prefer to download the mapping file externally, you can access the exact same file using the link below:
@@ -292,7 +292,7 @@ If you wish to use your own dataset for the SNP-to-Gene projection, you can inpu
 
 ## 🚀 Quick Start with Demo Data
 
-We provide demo data in the `data/sig_snp_list` directory so you can test the pipeline immediately after cloning the repository. The information for labelling these data is stored in `code/snpic_ss_definitive_edition/master_disease_mapping.csv`, please input it via the `--master_map` command.
+We provide demo data in the `data/sig_snp_list` directory so you can test the pipeline immediately after cloning the repository. The information for labelling these data is stored in `data/master_map/master_disease_mapping.csv`, please input it via the `--master_map` command.
 
 1. Clone the repository and navigate to the directory:
 ```bash
@@ -307,8 +307,8 @@ chmod +x run_snpic.R
 ```
 Rscript ./run_snpic.R \
   --input_folder "./data/sig_snp_list/" \
-  --snp_gene_map "./code/snpic_ss_definitive_edition/snp_gene_map_merged_finngen_ukbb.txt" \
-  --master_map "./code/snpic_ss_definitive_edition/master_disease_mapping.csv" \
+  --snp_gene_map "./code/core/snp_gene_map_merged_finngen_ukbb.txt" \
+  --master_map "./data/master_map/master_disease_mapping.csv" \
   --out_prefix "./results/demo_run/snpic_res" \
   --k_min 5 \
   --k_max 40 \

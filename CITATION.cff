@@ -2,14 +2,27 @@ cff-version: 1.2.0
 message: "If you use SNPic in your research, please cite this paper."
 title: "SNPic: SNP Topic Modeling for Interpretable Clustering of Complex Phenotypes"
 authors:
-  - given-names: Leyi
-    family-names: Zhang
-    email: leyi.zhang@uzh.ch
-    orcid: https://orcid.org/0000-0000-0000-0000
-    affiliation: "University Hospital Zurich, University of Zurich"
-  - given-names: [Other Authors]
-    family-names: ""
-    affiliation: "University Hospital Zurich, University of Zurich"
+  - given-names: Zhang
+    family-names: Leyi
+    email: leyi.zhang@usz.ch
+    orcid: https://orcid.org/0009-0005-1256-7412
+    affiliation: "Center of Experimental Rheumatology, University Hospital Zurich"
+  - given-names: Christof
+    family-names: Seiler
+    email: christof.seiler@usz.ch
+    affiliation: "Center of Experimental Rheumatology, University Hospital Zurich"
+  - given-names: Doug
+    family-names: Speed
+    email: doug@qgg.au.dk
+    affiliation: "Center for Quantitative Genetics and Genomics, Aarhus University"
+  - given-names: Raphael
+    family-names: Micheroli
+    email: raphael.micheroli@usz.ch
+    affiliation: "Center of Experimental Rheumatology, University Hospital Zurich"
+  - given-names: Caroline
+    family-names: Ospelt
+    email: caroline.ospelt@usz.ch
+    affiliation: "Center of Experimental Rheumatology, University Hospital Zurich"
 identifiers:
   - type: doi
     value: "10.64898/2026.04.22.720106"
