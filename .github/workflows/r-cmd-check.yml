@@ -31,28 +31,22 @@ jobs:
             libxml2-dev \
             libgsl-dev \
             libharfbuzz-dev \
-            libfribidi-dev
+            libfribidi-dev \
+            libgmp-dev \
+            libmpfr-dev
 
-      - name: Install R dependencies
+      - name: Install R packages (core only)
         run: |
-          Rscript -e '
-            required <- c(
-              "data.table", "dplyr", "tidyr", "reshape2", "stringr",
-              "readr", "tidyverse", "tidytext", "abind",
-              "optparse", "httr", "jsonlite",
-              "topicmodels", "tm", "umap", "igraph",
-              "ggplot2", "ggrepel", "ggraph", "pheatmap",
-              "RColorBrewer", "viridis", "scales",
-              "BiocManager"
-            )
-            for (pkg in required) {
-              if (!requireNamespace(pkg, quietly = TRUE)) {
-                install.packages(pkg, repos = "https://cloud.r-project.org")
-              }
-            }
-            BiocManager::install(c("clusterProfiler", "org.Hs.eg.db"),
-                                 ask = FALSE, update = FALSE)
-          '
+          install.packages(c(
+            "data.table", "dplyr", "tidyr", "reshape2", "stringr",
+            "readr", "tidytext", "abind",
+            "optparse", "httr", "jsonlite",
+            "topicmodels", "tm", "igraph",
+            "ggplot2", "ggrepel", "ggraph", "pheatmap",
+            "RColorBrewer", "viridis", "scales",
+            "BiocManager"
+          ), repos = "https://cloud.r-project.org", Ncpus = 4)
+        shell: Rscript {0}
 
       - name: Check R script syntax
         run: |
