@@ -13,7 +13,7 @@ If you use SNPic in your research, please cite our paper:
 ```bib
 @article{zhang2026snpic,
   title={SNPic: SNP Topic Modeling for Interpretable Clustering of Complex Phenotypes},
-  author={Zhang Leyi and Christof Seiler and Doug Speed and Raphael Micheroli and Caroline Ospelt},
+  author={Leyi Z. and Seiler C. and Speed D. and Micheroli R. and Ospelt C.},
   journal={bioRxiv},
   year={2026},
   doi={10.64898/2026.04.22.720106}
