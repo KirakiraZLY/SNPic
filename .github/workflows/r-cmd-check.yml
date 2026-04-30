@@ -28,8 +28,8 @@ jobs:
         shell: micromamba-shell {0}
         run: |
           Rscript -e '
-            files <- list.files("code/core", pattern = "\\.R$", full.names = TRUE)
-            files <- c(files, list.files("code/utils", pattern = "\\.R$", full.names = TRUE))
+            files <- list.files("code/core", pattern = "[.]R$", full.names = TRUE)
+            files <- c(files, list.files("code/utils", pattern = "[.]R$", full.names = TRUE))
             cat("Checking", length(files), "R scripts...\n")
             for (f in files) {
               cat("  ✓", basename(f), "\n")
