@@ -11,7 +11,7 @@ If you use SNPic in your research, please cite our paper:
 > Leyi Z., Seiler C., Speed D., Micheroli R., Ospelt C. et al. (2026). *SNPic: SNP Topic Modeling for Interpretable Clustering of Complex Phenotypes*. bioRxiv. DOI: [10.64898/2026.04.22.720106](https://doi.org/10.64898/2026.04.22.720106)
 
 ```bib
-@article{zhang2026snpic,
+@article{leyi2026snpic,
   title={SNPic: SNP Topic Modeling for Interpretable Clustering of Complex Phenotypes},
   author={Zhang Leyi and Christof Seiler and Doug Speed and Raphael Micheroli and Caroline Ospelt},
   journal={bioRxiv},
