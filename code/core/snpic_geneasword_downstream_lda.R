@@ -1,4 +1,4 @@
-﻿# downstream_lda.R
+# downstream_lda.R
 run_downstream_lda <- function(input_mat, final_res, meta_df, best_k, best_thresh, master_map, prefix, output_dir, seed, keep_all_traits=FALSE) {
   cat("\n############################################\n")
   cat("Starting Downstream Analysis (Normal LDA)\n")
