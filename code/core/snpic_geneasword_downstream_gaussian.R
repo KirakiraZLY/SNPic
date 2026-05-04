@@ -1,4 +1,4 @@
-# downstream_gaussian.R
+﻿# downstream_gaussian.R
 run_downstream_gaussian <- function(input_mat, final_res, meta_df, best_k, best_thresh, master_map, prefix, output_dir, seed, keep_all_traits=FALSE) {
   cat("\n############################################\n")
   cat("Starting Downstream Analysis (Gaussian LDA)\n")
@@ -51,7 +51,7 @@ run_downstream_gaussian <- function(input_mat, final_res, meta_df, best_k, best_
   #if(!is.null(sim_res_gaussian$correlation_plots$heatmap)) ggsave(paste0(prefix_gaussian, "_similarity_heatmap.png"), sim_res_gaussian$correlation_plots$heatmap, width=14, height=10)
 
   # ==========================================
-  # 【核心修改区 1】：Topic Distributions 画图函数
+  # 【Core Modification Area 1】：Topic Distributions plotting function
   # ==========================================
   plot_topic_dist <- function(topic_mat, title_str, out_file) {
     non_topic_cols <- c("Disease", "disease_clean", "label_map", "label", "label2", "Disease_file", "Disease_Unique", "MaxTopic")
@@ -61,7 +61,7 @@ run_downstream_gaussian <- function(input_mat, final_res, meta_df, best_k, best_
     df_topics <- topic_mat[, cols_to_keep]
     df_topics$MaxTopic <- factor(apply(df_topics[, topic_cols], 1, which.max), levels = 1:length(topic_cols))
     
-    # 这里兼容 Gene-as-word 和 SS-as-word 的 Display_Name 逻辑
+    # Handle Display_Name for both Gene-as-word and SS-as-word
     if("label2" %in% colnames(df_topics)) {
         df_topics$Display_Name <- paste0(df_topics$Disease, " (", df_topics$label2, ")")
     } else {
@@ -75,7 +75,7 @@ run_downstream_gaussian <- function(input_mat, final_res, meta_df, best_k, best_
     df_melt$TopicNum <- gsub("\\D", "", as.character(df_melt$Topic))
     
     p <- ggplot(df_melt, aes(x=Probability, y=Disease_Unique, fill=Topic)) +
-      geom_bar(stat="identity", position="stack", width = 0.85) + # 柱子稍微变细一点点，增加透气感
+      geom_bar(stat="identity", position="stack", width = 0.85) + # Slightly thinner bars for better visual breathing room
       geom_text(data = subset(df_melt, Probability >= 0.05), aes(label = TopicNum), position = position_stack(vjust = 0.5), size = 6, color = "black", fontface = "bold") +
       scale_y_discrete(labels=setNames(as.character(df_topics$Display_Name), df_topics$Disease_Unique)) + 
       theme_classic() + 
@@ -87,19 +87,19 @@ run_downstream_gaussian <- function(input_mat, final_res, meta_df, best_k, best_
         axis.title.x = element_text(size = 22, face = "bold", margin = margin(t = 15)),
         legend.text = element_text(size = 16), 
         legend.title = element_text(size = 18, face = "bold"),
-        plot.margin = margin(20, 30, 20, 20) # 增加四周的留白，防止标签被切掉
+        plot.margin = margin(20, 30, 20, 20) # Increase margins to prevent label clipping
       )
       
-    # 【核心修复】：将 width 从 14 提高到 22，彻底解决横向挤压的问题
+    # 【Core Fix】：Increase width from 14 to 22 to fix horizontal compression
     ggsave(out_file, p, width=22, height=max(10, nrow(df_topics) * 0.5), limitsize = FALSE)
   }  
   plot_topic_dist(gaussian_topic_matrix_std, "Gaussian Topic Distribution", paste0(prefix_gaussian, "_topic_dist_sorted.png"))
 
   # ==========================================
-  # 【核心修改区 2】：新增绘制 Top Genes Per Topic 的函数
+  # 【Core Modification Area 2】：New function to plot Top Genes Per Topic
   # ==========================================
   plot_top_genes_gaussian <- function(gene_terms_mat, title_str, out_file, top_n = 10) {
-    # 1. 提取矩阵中的 Top N 个基因并转换成长格式
+    # 1. Extract Top N genes from matrix, convert to long format
     df_long <- data.frame()
     
     for (i in 1:ncol(gene_terms_mat)) {
@@ -109,7 +109,7 @@ run_downstream_gaussian <- function(input_mat, final_res, meta_df, best_k, best_
       }
       
       topic_weights <- gene_terms_mat[, i]
-      # 排序并提取权重最高的索引
+      # Sort and extract indices with highest weights
       top_idx <- order(topic_weights, decreasing = TRUE)[1:top_n]
       
       temp_df <- data.frame(
@@ -121,19 +121,19 @@ run_downstream_gaussian <- function(input_mat, final_res, meta_df, best_k, best_
       df_long <- rbind(df_long, temp_df)
     }
     
-    # 2. 归一化处理并生成画图用的独立 ID
+    # 2. Normalize and generate unique IDs for plotting
     plot_terms <- df_long %>%
       group_by(Topic) %>%
       mutate(Normalized_Weight = Weight / max(Weight)) %>%
       ungroup() %>%
       mutate(unique_term_id = paste(Topic, Gene, sep = "___"))
     
-    # 3. 动态设定排版和画板尺寸 (最多排 4 列)
+    # 3. Dynamically set layout and canvas size (max 4 columns)
     n_topics <- length(unique(plot_terms$Topic))
     n_cols <- min(4, n_topics)
     n_rows <- ceiling(n_topics / n_cols)
     
-    # 4. 绘图
+    # 4. Plotting
     p_top <- ggplot(plot_terms, aes(x = reorder(unique_term_id, Normalized_Weight), y = Normalized_Weight, fill = Topic)) +
       geom_bar(stat = "identity") +
       facet_wrap(~Topic, scales = "free_y", ncol = n_cols) +
@@ -157,7 +157,7 @@ run_downstream_gaussian <- function(input_mat, final_res, meta_df, best_k, best_
     ggsave(out_file, p_top, width = max(14, n_cols * 4.5), height = max(8, n_rows * 4), dpi = 300, limitsize = FALSE)
   }
   
-  # 调用刚才写的函数，提取前 10 个基因
+  # Call the function above, extract top 10 genes
   plot_top_genes_gaussian(out_gaussian$gene_terms, 
                           title_str = "Top 10 Genes per Topic (Gaussian Model)", 
                           out_file = paste0(prefix_gaussian, "_top10_genes.png"), 

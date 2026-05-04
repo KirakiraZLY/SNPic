@@ -1,80 +1,80 @@
 #!/usr/bin/env Rscript
 
-# 如果没有 data.table 包则自动安装
+# Auto-install data.table package if not available
 if (!requireNamespace("data.table", quietly = TRUE)) {
   install.packages("data.table", repos = "http://cran.us.r-project.org")
 }
 library(data.table)
 
-# ================= 配置区域 =================
+# ================= Configuration Area =================
 input_file <- "/shares/rheumatologie.usz/zly/proj1_2_lda_evaluation/snp_gene_projection/snp_gene_map_merged.txt"
 output_file <- "/shares/rheumatologie.usz/zly/proj1_2_lda_evaluation/snp_gene_projection/snp_gene_map_merged_coding_only.txt"
-hgnc_local_cache <- "hgnc_complete_set.txt" # 本地缓存文件名
+hgnc_local_cache <- "hgnc_complete_set.txt" # Local cache filename
 
-# ================= 1. 连接并获取外部权威数据库 =================
-cat("正在连接 HGNC 外部数据库下载最新基因注释...\n")
-# 【已修复】：使用 HGNC 最新的 Google Cloud Storage 官方下载地址
+# ================= 1. Connect and fetch external authoritative database =================
+cat("Connecting to HGNC external database to download latest gene annotations...\n")
+# [Fixed]: Use the latest official HGNC Google Cloud Storage download URL
 url <- "https://storage.googleapis.com/public-download-files/hgnc/tsv/tsv/hgnc_complete_set.txt"
 
-# 为了加快后续运行速度，如果本地已有缓存则直接读取
+# Use local cache if available to speed up subsequent runs
 if (!file.exists(hgnc_local_cache)) {
   download.file(url, destfile = hgnc_local_cache, method = "auto", quiet = FALSE)
-  cat("数据库下载完成！\n")
+  cat("Database download complete!\n")
 } else {
-  cat("发现本地 HGNC 数据库缓存，直接加载...\n")
+  cat("Found local HGNC database cache, loading directly...\n")
 }
 
-# 读取数据库 (quote = "" 防止 HGNC 内部包含的不规则引号导致解析错位)
-cat("正在构建蛋白编码基因 (Protein-Coding Genes) 词典...\n")
+# Read database (quote = "" prevents parsing errors from irregular quotes within HGNC)
+cat("Building protein-coding gene dictionary...\n")
 hgnc_df <- fread(hgnc_local_cache, sep = "\t", quote = "")
 
-# 筛选出明确分类为 "protein-coding gene" 的基因
+# Filter genes explicitly classified as "protein-coding gene"
 pc_genes <- hgnc_df[locus_group == 'protein-coding gene']
 
-# 提取正式 symbol，并剔除空值
+# Extract official symbol and remove empty values
 symbols <- pc_genes$symbol[!is.na(pc_genes$symbol) & pc_genes$symbol != ""]
 
-# 提取别名 (alias_symbol) 并按照 "|" 分割
+# Extract alias symbols and split by "|"
 aliases <- pc_genes$alias_symbol[!is.na(pc_genes$alias_symbol) & pc_genes$alias_symbol != ""]
 aliases_split <- unlist(strsplit(aliases, "\\|"))
 
-# 提取曾用名 (prev_symbol) 并按照 "|" 分割
+# Extract previous symbols and split by "|"
 prevs <- pc_genes$prev_symbol[!is.na(pc_genes$prev_symbol) & pc_genes$prev_symbol != ""]
 prevs_split <- unlist(strsplit(prevs, "\\|"))
 
-# 【核心】：使用 unique 将所有名字合并进哈希向量 (相当于 Python 的 Set)
+# [Core]: Merge all names into a unique set (equivalent to Python's Set)
 valid_coding_genes <- unique(trimws(c(symbols, aliases_split, prevs_split)))
 valid_coding_genes <- valid_coding_genes[valid_coding_genes != ""]
 
-cat(sprintf("成功构建！共录入 %d 个有效的蛋白编码基因名称（含别名）。\n", length(valid_coding_genes)))
+cat(sprintf("Successfully built! Indexed %d valid protein-coding gene names (including aliases).\n", length(valid_coding_genes)))
 
-# ================= 2. 清洗您的数据 =================
-cat("\n开始清洗您的 SNP-Gene 映射文件...\n")
+# ================= 2. Clean your data =================
+cat("\nCleaning your SNP-Gene mapping file...\n")
 
-# 使用 data.table 高速读取输入文件 (按空格/制表符自动拆分为 V1, V2 列)
-# fill=TRUE 防止有些 SNP 后面没有基因导致报错
+# Use data.table for fast file reading (auto-split by space/tab into V1, V2 columns)
+# fill=TRUE prevents errors when some SNPs have no gene following
 dt <- fread(input_file, header = FALSE, col.names = c("SNP", "GENES"), fill = TRUE)
 count_total <- nrow(dt)
 
-cat("正在解析并展开基因列表...\n")
-# 将以逗号分隔的基因名拆分成多行 (例如一行 SNP 对应 A,B 会变成两行 SNP A 和 SNP B)
+cat("Parsing and expanding gene lists...\n")
+# Split comma-separated gene names into multiple rows (e.g. one row with A,B becomes two: SNP A and SNP B)
 dt_long <- dt[, .(GENE = unlist(strsplit(GENES, ","))), by = SNP]
 
-# 清除基因名称前后的空白字符
+# Trim whitespace around gene names
 dt_long[, GENE := trimws(GENE)]
 
-cat("正在应用 HGNC 蛋白编码基因过滤器...\n")
-# 【核心逻辑】：向量化极速过滤，保留存在于 HGNC 字典中的基因
+cat("Applying HGNC protein-coding gene filter...\n")
+# [Core Logic]: Vectorized fast filtering, keep only genes present in the HGNC dictionary
 dt_filtered <- dt_long[GENE %in% valid_coding_genes]
 
 count_kept <- nrow(dt_filtered)
 
-# 保存清洗后的结果
-cat("正在保存结果...\n")
+# Save the cleaned results
+cat("Saving results...\n")
 fwrite(dt_filtered, output_file, sep = " ", col.names = FALSE, quote = FALSE)
 
 cat("========================================\n")
-cat("清洗完成！\n")
-cat(sprintf("处理的总行数 (原始文件行数): %d\n", count_total))
-cat(sprintf("保留的蛋白编码基因映射对数: %d\n", count_kept))
-cat(sprintf("结果已保存至: %s\n", output_file))
+cat("Cleaning complete!\n")
+cat(sprintf("Total rows in original file: %d\n", count_total))
+cat(sprintf("Protein-coding gene mappings retained: %d\n", count_kept))
+cat(sprintf("Results saved to: %s\n", output_file))

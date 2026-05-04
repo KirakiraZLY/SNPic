@@ -35,7 +35,7 @@ cat("3. Translating IDs via GTEx Lookup Table (Bridging GRCh37 to GRCh38)...\n")
 lookup <- fread(lookup_file, select = c("variant_id", "rs_id_dbSNP151_GRCh38p7"))
 setnames(lookup, "rs_id_dbSNP151_GRCh38p7", "rsID")
 
-# 用你的 rsID 去匹配，完美无视坐标系差异
+# Match using your rsID, seamlessly ignoring coordinate system differences
 lookup_filtered <- lookup[rsID %in% my_snps]
 rm(lookup); gc()
 

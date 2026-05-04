@@ -1,4 +1,4 @@
-library(maptpx)
+﻿library(maptpx)
 library(reshape2)
 library(ggplot2)
 library(dplyr)
@@ -83,11 +83,11 @@ run_gene_as_word_analysis <- function(folder, snp_gene_map_file, prefix = NULL, 
   require(Matrix)
   time_start <- Sys.time()
   
-  # 1. 使用 data.table 极速读取映射表
+  # 1. Use data.table for fast reading of the mapping table
   snp_gene_map <- fread(snp_gene_map_file, header = FALSE, col.names = c("SNP", "Gene"))
   setkey(snp_gene_map, SNP) 
   
-  # 2. 批量读取所有表型文件
+  # 2. Batch read all phenotype files
   files <- list.files(folder, full.names = TRUE)
   cat(sprintf("Processing %d files using data.table...\n", length(files)) )
   
@@ -124,7 +124,7 @@ run_gene_as_word_analysis <- function(folder, snp_gene_map_file, prefix = NULL, 
   return(result)
 }
 
-# 统一且纯净的 resolve_labels 函数
+# Unified and clean resolve_labels function
 resolve_labels <- function(df, master_map = NULL) {
   if (is.null(master_map)) {
     df$label <- "Other"
@@ -132,23 +132,23 @@ resolve_labels <- function(df, master_map = NULL) {
     return(df)
   }
   
-  # 清理疾病名称用于匹配
+  # Clean disease names for matching
   if (!"disease_clean" %in% colnames(df)) {
     df$disease_clean <- gsub("^finngen_R12_|\\.list$|\\.tsv\\.bgz$", "", df$Disease)
   }
   
-  # 防止重复匹配导致数据膨胀
+  # Prevent data inflation from duplicate matching
   master_sub <- master_map[!duplicated(master_map$clean_filename), c("clean_filename", "trait", "label1", "label2")]
   
-  # 合并
+  # Merge
   df_merged <- merge(df, master_sub, by.x = "disease_clean", by.y = "clean_filename", all.x = TRUE)
   
-  # 覆盖原列：有 trait 用 trait，有 label1 用 label1，否则给默认值
+  # Override: use trait if available, label1 if available, otherwise defaults
   df_merged$Disease <- ifelse(!is.na(df_merged$trait) & df_merged$trait != "", df_merged$trait, df_merged$Disease)
   df_merged$label <- ifelse(!is.na(df_merged$label1) & df_merged$label1 != "", df_merged$label1, "Other")
   df_merged$label2 <- ifelse(!is.na(df_merged$label2) & df_merged$label2 != "", df_merged$label2, "Unknown")
   
-  # 剔除辅助列
+  # Remove auxiliary columns
   df_merged$disease_clean <- NULL
   df_merged$trait <- NULL
   df_merged$label1 <- NULL
@@ -319,30 +319,30 @@ run_lda_analysis <- function(result_matrix, prefix = NULL, master_map = NULL, k 
     group_by(Topic) %>%
     arrange(desc(Weight)) %>% 
     slice_head(n = 10) %>% 
-    # --- [关键修改 1]：归一化权重，使每个 Topic 的最大值都为 1 ---
+    # --- [Key Modification 1]：Normalize weights so each Topic maximum is 1 ---
     mutate(Normalized_Weight = Weight / max(Weight)) %>%
     # --------------------------------------------------------
   ungroup() %>%
     mutate(unique_term_id = paste(Topic, Comorbidity, sep = "___"))
   
   # 3. Plotting
-  # 注意：这里 y 轴变成了 Normalized_Weight
+  # Note: the y-axis is now Normalized_Weight
   p_top_words <- ggplot(plot_terms, aes(x = reorder(unique_term_id, Normalized_Weight), y = Normalized_Weight, fill = Topic)) +
     geom_bar(stat = "identity") +
-    # scales="free_y" 允许不同分面有不同的词（y轴），但 x轴（数值）现在都是 0-1
+    # scales="free_y" allows different facets different words (y); x-axis values are now 0-1
     facet_wrap(~Topic, scales = "free_y") + 
     coord_flip() +
     theme_classic() +
     
-    # --- [关键修改 2]：控制横轴（原Y轴）刻度 ---
+    # --- [Key Modification 2]：Control horizontal axis (original Y-axis) scale ---
     scale_y_continuous(
-      limits = c(0, 1.05), # 强制范围 0 到 1 (多给0.05防止顶格)
-      breaks = c(1),       # 只显示最大值 1
-      expand = c(0, 0)     # 减少边缘留白
+      limits = c(0, 1.05), # Force range 0-1 (extra 0.05 to prevent clipping)
+      breaks = c(1),       # Only show max value 1
+      expand = c(0, 0)     # Reduce edge padding
     ) +
     # ------------------------------------------
   
-  # 去除 label 前缀
+  # Remove label prefix
   scale_x_discrete(labels = function(x) sub(".*___", "", x)) +
     
     theme(
@@ -450,31 +450,31 @@ run_lda_analysis <- function(result_matrix, prefix = NULL, master_map = NULL, k 
               pca_df = pca_df))
 }
 
-# 首先，创建一个函数来计算困惑度和一致性
+# First, create a function to calculate perplexity and coherence
 calculate_lda_metrics <- function(result_matrix, k) {
-  # 清理输入矩阵
+  # Clean input matrix
   result <- result_matrix[apply(result_matrix, 1, function(x) !all(x == 0)), ]
   result <- result[, apply(result, 2, function(x) !all(x == 0))]
   
-  # 创建文档-词项矩阵
+  # Create document-term matrix
   dtm <- as.DocumentTermMatrix(as.matrix(result), weighting = weightTf)
   
-  # 运行LDA
+  # Run LDA
   lda_model <- topicmodels::LDA(
     dtm, k,
     method = "Gibbs",
     control = list(seed = 1234, alpha = 0.01, delta = 0.01, burnin = 1000, iter = 3000, thin = 100)
   )
   
-  # 计算困惑度
+  # Calculate perplexity
   perp <- perplexity(lda_model, newdata = dtm)
   
-  # 计算一致性 (简化版本)
-  phi <- exp(lda_model@beta)  # 主题-词分布
+  # Calculate coherence (simplified version)
+  phi <- exp(lda_model@beta)  # Topic-term distribution
   
-  # 计算主题间相似性作为一致性代理
+  # Calculate inter-topic similarity as proxy for coherence
   topic_similarity <- cor(t(phi))
-  diag(topic_similarity) <- NA  # 忽略对角线
+  diag(topic_similarity) <- NA  # Ignore diagonal
   coherence <- mean(topic_similarity, na.rm = TRUE)
   
   return(list(perplexity = perp, coherence = coherence))
@@ -486,7 +486,7 @@ choose_best_n_topic_multi <- function(result_matrix,
                                   map_detail_func = map_disease_individual_detail,
                                   topic_range = 4:10) {
   
-  # 评估不同主题数量
+  # Evaluate different numbers of topics
   metrics <- data.frame(k = topic_range, perplexity = NA, coherence = NA)
   
   for (k in topic_range) {
@@ -496,26 +496,26 @@ choose_best_n_topic_multi <- function(result_matrix,
     metrics[metrics$k == k, "coherence"] <- metrics_result$coherence
   }
   
-  # 选择最佳k值
-  # 归一化指标并计算综合评分
-  metrics$norm_perplexity <- 1 / metrics$perplexity  # 困惑度越低越好，所以取倒数
-  metrics$norm_coherence <- metrics$coherence  # 一致性越高越好
+  # Select best k value
+  # Normalize metrics and calculate composite score
+  metrics$norm_perplexity <- 1 / metrics$perplexity  # Lower perplexity is better, so take reciprocal
+  metrics$norm_coherence <- metrics$coherence  # Higher coherence is better
   
-  # 归一化到0-1范围
+  # Normalize to 0-1 range
   metrics$norm_perplexity <- (metrics$norm_perplexity - min(metrics$norm_perplexity, na.rm = TRUE)) / 
     (max(metrics$norm_perplexity, na.rm = TRUE) - min(metrics$norm_perplexity, na.rm = TRUE))
   
   metrics$norm_coherence <- (metrics$norm_coherence - min(metrics$norm_coherence, na.rm = TRUE)) / 
     (max(metrics$norm_coherence, na.rm = TRUE) - min(metrics$norm_coherence, na.rm = TRUE))
   
-  # 计算综合评分（各指标权重可调整）
+  # Calculate composite score (metric weights adjustable)
   metrics$composite_score <- 0.6 * metrics$norm_perplexity + 0.4 * metrics$norm_coherence
   
-  # 选择综合评分最高的k
+  # Select k with highest composite score
   best_k <- metrics$k[which.max(metrics$composite_score)]
   cat("Selected best k:", best_k, "\n")
   
-  # 使用最佳k运行完整分析
+  # Run full analysis with best k
   result <- run_lda_analysis(
     result_matrix = result_matrix,
     prefix = prefix,
@@ -524,7 +524,7 @@ choose_best_n_topic_multi <- function(result_matrix,
     k = best_k
   )
   
-  # 添加评估指标到结果
+  # Add evaluation metrics to results
   result$best_k <- best_k
   result$metrics <- metrics
   

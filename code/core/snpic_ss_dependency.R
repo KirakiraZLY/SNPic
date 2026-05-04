@@ -64,7 +64,7 @@ cat("Sourcing custom analytical scripts dynamically...\n")
 if (exists("script_dir")) {
   BASE_DIR <- script_dir
 } else {
-  BASE_DIR <- getwd() # 仅在非 run_snpic.R 环境下单跑此脚本时作为 Fallback
+  BASE_DIR <- getwd() # Only as Fallback when running this script standalone (not via run_snpic.R)
 }
 PARENT_DIR <- dirname(BASE_DIR)
 

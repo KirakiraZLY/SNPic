@@ -36,7 +36,7 @@ extract_top_genes_per_topic <- function(top_genes_obj, top_n = 50, model_type = 
   
   if (model_type == "normal") {
     topics <- unique(top_genes_obj$Topic)
-    # 按照数字顺序排序
+    # Sort in numerical order
     topics <- topics[order(as.numeric(topics))]
     
     for (topic in topics) {
@@ -97,7 +97,7 @@ perform_enrichment_analysis <- function(gene_list, analysis_name, p_cutoff = 0.0
   
   results <- list()
   
-  # 极度放宽 KEGG 搜索能力 (使用原始 P 值 < 0.1)
+  # Drastically relax KEGG search criteria (using raw P-value < 0.1)
   tryCatch({
     kegg_result <- enrichKEGG(
       gene = entrez_ids,
@@ -115,7 +115,7 @@ perform_enrichment_analysis <- function(gene_list, analysis_name, p_cutoff = 0.0
     results$kegg <- NULL
   })
   
-  # GO Biological Process enrichment (保持原有标准)
+  # GO Biological Process enrichment (keeping original criteria)
   tryCatch({
     go_bp_result <- enrichGO(
       gene = entrez_ids,
@@ -228,7 +228,7 @@ analyze_all_topics <- function(topic_genes_list, model_name, prefix_pathway, top
   return(all_results)
 }
 
-#' 【新增功能】：将每个 Topic 最显著的 Pathways 导出成表格
+#' [New Feature]: Export the top significant pathways for each Topic as a table
 #' @param enrichment_results Enrichment results list
 #' @param model_name Name of the model
 #' @param prefix_pathway Output directory path
@@ -241,7 +241,7 @@ export_top_pathways_table <- function(enrichment_results, model_name, prefix_pat
   sorted_topics <- topic_names[order(topic_nums)]
   
   for (topic in sorted_topics) {
-    # 提取 GO BP 前三名
+    # Extract top 3 GO BP terms
     if (!is.null(enrichment_results[[topic]]$go_bp) && nrow(as.data.frame(enrichment_results[[topic]]$go_bp)) > 0) {
       go_df <- as.data.frame(enrichment_results[[topic]]$go_bp)
       go_df <- go_df %>%
@@ -251,17 +251,17 @@ export_top_pathways_table <- function(enrichment_results, model_name, prefix_pat
         dplyr::select(Topic, Model, Analysis, ID, Description, pvalue, p.adjust, Count)
       all_data <- rbind(all_data, go_df)
     } else {
-      # 若无显著结果则填入占位符
+      # Fill with placeholder if no significant results
       all_data <- rbind(all_data, data.frame(Topic = topic, Model = model_name, Analysis = "GO_BP", 
                                              ID = NA, Description = "No significant enrichment", 
                                              pvalue = NA, p.adjust = NA, Count = 0))
     }
     
-    # 提取 KEGG 前三名
+    # Extract top 3 KEGG pathways
     if (!is.null(enrichment_results[[topic]]$kegg) && nrow(as.data.frame(enrichment_results[[topic]]$kegg)) > 0) {
       kegg_df <- as.data.frame(enrichment_results[[topic]]$kegg)
       kegg_df <- kegg_df %>%
-        arrange(pvalue) %>% # KEGG 使用未校正的 pvalue 排序
+        arrange(pvalue) %>% # KEGG uses uncorrected pvalue for sorting
         head(top_n) %>%
         mutate(Topic = topic, Model = model_name, Analysis = "KEGG") %>%
         dplyr::select(Topic, Model, Analysis, ID, Description, pvalue, p.adjust, Count)
@@ -316,7 +316,7 @@ create_combined_faceted_plots <- function(enrichment_results, model_name, prefix
         enrich_df$Model <- model_name
         enrich_df$Analysis <- analysis_type
         
-        # 初始提取，强制只取 top_terms (现在被设定为 3)
+        # Initial extraction, force only top_terms (now set to 3)
         if (analysis_type == "kegg") {
            top_data <- enrich_df %>%
              arrange(pvalue) %>%
@@ -329,7 +329,7 @@ create_combined_faceted_plots <- function(enrichment_results, model_name, prefix
         
         all_data <- rbind(all_data, top_data)
       } else {
-        # 处理空结果
+        # Handle empty results
         if (!is.null(sample_structure)) {
           empty_row <- sample_structure[1, , drop = FALSE]
           empty_row[1, ] <- NA
@@ -391,7 +391,7 @@ create_combined_faceted_plots <- function(enrichment_results, model_name, prefix
         HasWrap = str_detect(DescriptionWrapped, "\n"),
         Topic = factor(Topic_Label, levels = unique(as.character(sort(unique(Topic_Num))))),
         
-        # 计算对数P值用于X轴
+        # Calculate -log10(p-value) for X-axis
         neg_log_pvalue = if(analysis_name == "kegg") {
                             ifelse(is.na(pvalue) | pvalue == 1.0, 0, -log10(pvalue))
                          } else {
@@ -402,7 +402,7 @@ create_combined_faceted_plots <- function(enrichment_results, model_name, prefix
       group_by(Topic) %>%
       arrange(desc(neg_log_pvalue)) %>%
       mutate(
-        CurrentSliceLimit = top_terms, # 【修改点】：动态跟随顶层参数，不再硬编码为 2
+        CurrentSliceLimit = top_terms, # [Modification Point]: Dynamically follow the top-level parameter, no longer hardcoded to 2
         GroupRank = row_number()
       ) %>%
       filter(GroupRank <= CurrentSliceLimit) %>%
@@ -457,7 +457,7 @@ create_combined_faceted_plots <- function(enrichment_results, model_name, prefix
   save_plot <- function(p, filename, n_topics) {
     w <- 45
     
-    # 【修改点】：高度统一增加 2
+    # [Modification Point]: Uniformly increase height by 2
     if(n_topics > 6) { h <- 26 } 
     else if (n_topics > 4) { h <- 20 } 
     else if (n_topics > 2) { h <- 15 } 
@@ -519,7 +519,7 @@ create_combined_faceted_plots <- function(enrichment_results, model_name, prefix
 #' Main function to run pathway enrichment analysis
 run_pathway_analysis <- function(normal_top_genes, gaussian_top_genes,
                                  normal_topic_distribution, gaussian_topic_distribution,
-                                 prefix_pathway, top_genes = 50, top_terms = 3) { # 【修改点】：默认提取 3 个 terms
+                                 prefix_pathway, top_genes = 50, top_terms = 3) { # [Modification Point]: Default 3 terms
   
   load_pathway_packages()
   dir.create(prefix_pathway, recursive = TRUE, showWarnings = FALSE)
@@ -565,8 +565,8 @@ run_pathway_analysis <- function(normal_top_genes, gaussian_top_genes,
   
   # Create combined faceted plots
   cat("Creating combined faceted plots (paginated max 8 topics/plot)...\n")
-  create_combined_faceted_plots(normal_enrichment_results, "Normal_SNPic", prefix_pathway, top_terms = 3) # 【修改点】：调用时显式传入 3
-  create_combined_faceted_plots(gaussian_enrichment_results, "Gaussian_SNPic", prefix_pathway, top_terms = 3) # 【修改点】：调用时显式传入 3
+  create_combined_faceted_plots(normal_enrichment_results, "Normal_SNPic", prefix_pathway, top_terms = 3) # [Modification Point]: Explicitly pass 3 at call site
+  create_combined_faceted_plots(gaussian_enrichment_results, "Gaussian_SNPic", prefix_pathway, top_terms = 3) # [Modification Point]: Explicitly pass 3 at call site
   
   # Save all results
   save(normal_topic_genes, gaussian_topic_genes,

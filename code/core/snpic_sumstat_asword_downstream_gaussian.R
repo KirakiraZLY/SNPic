@@ -37,7 +37,7 @@ run_downstream_ss_gaussian <- function(input_mat, final_res, meta_df, best_k, be
   if(!is.null(sim_res_gaussian$correlation_plots$network)) ggsave(paste0(prefix_gaussian, "_similarity_network_gaussian.png"), sim_res_gaussian$correlation_plots$network, width=14, height=10)
 
   # ==========================================
-  # 1. Topic Distributions 画图函数
+  # 1. Topic Distributions plot function
   # ==========================================
   plot_topic_dist <- function(topic_mat, title_str, out_file) {
     non_topic_cols <- c("Disease", "disease_clean", "label_map", "label", "label2", "Disease_file", "Disease_Unique", "MaxTopic")
@@ -47,7 +47,7 @@ run_downstream_ss_gaussian <- function(input_mat, final_res, meta_df, best_k, be
     df_topics <- topic_mat[, cols_to_keep]
     df_topics$MaxTopic <- factor(apply(df_topics[, topic_cols], 1, which.max), levels = 1:length(topic_cols))
     
-    # 这里兼容 Gene-as-word 和 SS-as-word 的 Display_Name 逻辑
+    # Handle Display_Name logic compatible with both Gene-as-word and SS-as-word
     if("label2" %in% colnames(df_topics)) {
         df_topics$Display_Name <- paste0(df_topics$Disease, " (", df_topics$label2, ")")
     } else {
@@ -61,7 +61,7 @@ run_downstream_ss_gaussian <- function(input_mat, final_res, meta_df, best_k, be
     df_melt$TopicNum <- gsub("\\D", "", as.character(df_melt$Topic))
     
     p <- ggplot(df_melt, aes(x=Probability, y=Disease_Unique, fill=Topic)) +
-      geom_bar(stat="identity", position="stack", width = 0.85) + # 柱子稍微变细一点点，增加透气感
+      geom_bar(stat="identity", position="stack", width = 0.85) + # Slightly thinner bars for better readability
       geom_text(data = subset(df_melt, Probability >= 0.05), aes(label = TopicNum), position = position_stack(vjust = 0.5), size = 6, color = "black", fontface = "bold") +
       scale_y_discrete(labels=setNames(as.character(df_topics$Display_Name), df_topics$Disease_Unique)) + 
       theme_classic() + 
@@ -73,21 +73,21 @@ run_downstream_ss_gaussian <- function(input_mat, final_res, meta_df, best_k, be
         axis.title.x = element_text(size = 22, face = "bold", margin = margin(t = 15)),
         legend.text = element_text(size = 16), 
         legend.title = element_text(size = 18, face = "bold"),
-        plot.margin = margin(20, 30, 20, 20) # 增加四周的留白，防止标签被切掉
+        plot.margin = margin(20, 30, 20, 20) # Increase margin to prevent label clipping
       )
       
-    # 【核心修复】：将 width 从 14 提高到 22，彻底解决横向挤压的问题
+    # [Core Fix]: Increase width from 14 to 22 to eliminate horizontal compression
     ggsave(out_file, p, width=22, height=max(10, nrow(df_topics) * 0.5), limitsize = FALSE)
   }
   # ==========================================
-  # 2. 新增：Top Words Distributions (SS-as-Word 映射到 Trait)
+  # 2. New: Top Words Distributions (SS-as-Word mapped to Trait)
   # ==========================================
   plot_mapped_top_words_gaussian <- function(gene_terms_mat, master_map, title_str, out_file, top_n = 5) {
     require(dplyr)
     require(ggplot2)
     require(stringr)
 
-    # (A) 将 Gaussian 的权重矩阵转为长格式，并提取 top_n
+    # (A) Convert Gaussian weight matrix to long format and extract top_n
     df_long <- data.frame()
     for (i in 1:ncol(gene_terms_mat)) {
       topic_name <- colnames(gene_terms_mat)[i]
@@ -96,7 +96,7 @@ run_downstream_ss_gaussian <- function(input_mat, final_res, meta_df, best_k, be
       }
       
       topic_weights <- gene_terms_mat[, i]
-      # 降序排列并提取前 top_n 的索引
+      # Sort descending and extract indices of top_n
       top_idx <- order(topic_weights, decreasing = TRUE)[1:top_n]
       
       temp_df <- data.frame(
@@ -108,7 +108,7 @@ run_downstream_ss_gaussian <- function(input_mat, final_res, meta_df, best_k, be
       df_long <- rbind(df_long, temp_df)
     }
 
-    # (B) 清除前后缀映射到 master_map 里的真实名字
+    # (B) Strip prefixes/suffixes and map to real names in master_map
     df_long$clean_id <- tolower(trimws(gsub("^finngen_R12_|\\.list$|\\.tsv\\.bgz$|\\.txt$", "", df_long$Comorbidity)))
     
     if (!is.null(master_map)) {
@@ -123,7 +123,7 @@ run_downstream_ss_gaussian <- function(input_mat, final_res, meta_df, best_k, be
       df_mapped$Display_Name <- df_mapped$Comorbidity
     }
     
-    # (C) 归一化权重处理
+    # (C) Normalize weight processing
     plot_terms <- df_mapped %>%
       group_by(Topic) %>%
       arrange(desc(Weight)) %>% 
@@ -132,7 +132,7 @@ run_downstream_ss_gaussian <- function(input_mat, final_res, meta_df, best_k, be
       ungroup() %>%
       mutate(unique_term_id = paste(Topic, Display_Name, sep = "___"))
     
-    # (D) 智能排版逻辑 (固定 3 列)
+    # (D) Smart layout logic (fixed 3 columns)
     n_topics <- length(unique(plot_terms$Topic))
     n_cols <- 3  
     n_rows <- ceiling(n_topics / n_cols)
@@ -140,7 +140,7 @@ run_downstream_ss_gaussian <- function(input_mat, final_res, meta_df, best_k, be
     dynamic_width <- max(36, n_cols * 12) 
     dynamic_height <- max(12, n_rows * 6.0)
     
-    # (E) 绘制
+    # (E) Plot
     p_top_words <- ggplot(plot_terms, aes(x = reorder(unique_term_id, Normalized_Weight), y = Normalized_Weight, fill = Topic)) +
       geom_bar(stat = "identity") +
       facet_wrap(~Topic, scales = "free_y", ncol = n_cols) + 
@@ -158,17 +158,17 @@ run_downstream_ss_gaussian <- function(input_mat, final_res, meta_df, best_k, be
         panel.spacing.x = unit(5.5, "lines"), 
         panel.spacing.y = unit(3.0, "lines"),
         plot.margin = margin(30, 30, 30, 30),
-        legend.position = "none" # 隐藏图例保持页面整洁
+        legend.position = "none" # Hide legend to keep page clean
       ) +
       labs(title = title_str, x = "", y = "Relative Importance")
     
     ggsave(out_file, p_top_words, width = dynamic_width, height = dynamic_height, dpi = 300, limitsize = FALSE)
   }
 
-  # 调用绘图函数
+  # Call plot function
   plot_topic_dist(gaussian_topic_matrix_std, "Gaussian Topic Distribution (Sorted)", paste0(prefix_gaussian, "_topic_dist_sorted.png"))
   
-  # 调用我们刚刚写的提取 Top 5 函数
+  # Call the Top 5 extraction function we just wrote
   plot_mapped_top_words_gaussian(out_gaussian$gene_terms, master_map, 
                                  "Top 5 Words per Topic (Gaussian Mapped & Normalized)", 
                                  paste0(prefix_gaussian, "_gaussian_top5_words_normalized.png"), 

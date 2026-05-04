@@ -2,7 +2,7 @@
 # Similarity calculation and visualization functions (Modified for Duplicates & Legend)
 ############################################
 
-# 2. 计算相似度 (不变)
+# 2. Calculate similarity (unchanged)
 calculate_disease_similarity <- function(topic_numeric, method = "correlation") {
   if(!is.matrix(topic_numeric)) {
     topic_numeric <- as.matrix(topic_numeric)
@@ -50,7 +50,7 @@ calculate_disease_similarity <- function(topic_numeric, method = "correlation") 
   return(sim)
 }
 
-# 3. 热图可视化 (不变)
+# 3. Heatmap visualization (unchanged)
 visualize_topic_heatmap <- function(topic_numeric, disease_labels = NULL, model_type = "Unknown", method = "correlation") {
   require(ggplot2)
   require(reshape2)
@@ -87,7 +87,7 @@ visualize_topic_heatmap <- function(topic_numeric, disease_labels = NULL, model_
          x = "Topic", y = "Trait (Unique ID)")
 }
 
-# 4. 网络图 (Shape Only) - 添加 Edge Weight 图例
+# 4. Network graph (Shape Only) - Add Edge Weight legend
 visualize_network_shape_only <- function(similarity_matrix, disease_labels = NULL, model_type = "Unknown", method = "correlation", topic_matrix = NULL, edge_threshold_percentile = 0.70, seed = 123) {
   require(igraph)
   require(ggrepel)
@@ -158,7 +158,7 @@ visualize_network_shape_only <- function(similarity_matrix, disease_labels = NUL
                        alpha = weight, linewidth = weight), 
                    color = "grey60") 
     } +
-    # 【修改】：点的大小从 4 改大到 6
+    # [Modification]: Point size increased from 4 to 6
     geom_point(data = node_pos,
                aes(x = x, y = y, color = group, shape = group),
                size = 6, alpha = 0.9) +
@@ -184,7 +184,7 @@ visualize_network_shape_only <- function(similarity_matrix, disease_labels = NUL
   return(p)
 }
 
-# 5. 网络图 (Separate) - 添加 Edge Weight 图例，点放大
+# 5. Network graph (Separate) - Add Edge Weight legend, enlarge points
 visualize_network_separate <- function(similarity_matrix, disease_labels = NULL, model_type = "Unknown", method = "correlation", topic_matrix = NULL, edge_threshold_percentile = 0.70, seed = 123) {
   require(igraph)
   require(ggrepel)
@@ -259,7 +259,7 @@ visualize_network_separate <- function(similarity_matrix, disease_labels = NULL,
                        alpha = weight, linewidth = weight),
                    color = "grey60")
     } +
-    # 【修改】：点的大小从 4 改大到 6
+    # [Modification]: Point size increased from 4 to 6
     geom_point(data = node_pos,
                aes(x = x, y = y, color = color_group, shape = shape_group),
                size = 6, alpha = 0.9) +
@@ -284,7 +284,7 @@ visualize_network_separate <- function(similarity_matrix, disease_labels = NULL,
   return(p)
 }
 
-# 6. 主分析函数 (不变)
+# 6. Main analysis function (unchanged)
 analyze_disease_similarity <- function(topic_matrix, methods = c("hellinger", "correlation"), 
                                        model_type = "Unknown", mode = "shape_only", 
                                        edge_threshold = 0.70, seed = 123,

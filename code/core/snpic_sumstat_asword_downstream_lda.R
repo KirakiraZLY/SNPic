@@ -18,7 +18,7 @@ run_downstream_ss_lda <- function(input_mat, final_res, meta_df, best_k, best_th
   rownames(input_mat) <- trimws(rownames(input_mat))
   common_diseases <- intersect(rownames(input_mat), target_diseases)
 
-  # 对于 SS-as-word，矩阵是对称的，行列同时裁剪
+  # For SS-as-word, the matrix is symmetric; trim rows and columns simultaneously
   matrix_result <- input_mat[common_diseases, common_diseases, drop = FALSE]
   valid_idx <- apply(matrix_result, 2, function(x) length(unique(x)) > 1)
   matrix_result <- matrix_result[valid_idx, valid_idx, drop = FALSE]
@@ -37,7 +37,7 @@ run_downstream_ss_lda <- function(input_mat, final_res, meta_df, best_k, best_th
   sim_res_lda <- analyze_disease_similarity(snpic_topic_matrix, model_type = "LDA", mode = "separate", edge_threshold = 0.70, seed = seed)
   if(!is.null(sim_res_lda$correlation_plots$network)) ggsave(paste0(prefix_downstream, "_similarity_network_lda.png"), sim_res_lda$correlation_plots$network, width=14, height=10)
 
-  # Topic Distributions (SS-as-word 定制版：放大字号，整体变窄)
+  # Topic Distributions (SS-as-word custom version: larger font, narrower layout)
   plot_topic_dist <- function(topic_mat, title_str, out_file) {
     non_topic_cols <- c("Disease", "disease_clean", "label_map", "label", "label2", "Disease_file", "Disease_Unique", "MaxTopic")
     topic_cols <- setdiff(colnames(topic_mat), non_topic_cols)
@@ -46,7 +46,7 @@ run_downstream_ss_lda <- function(input_mat, final_res, meta_df, best_k, best_th
     df_topics <- topic_mat[, cols_to_keep]
     df_topics$MaxTopic <- factor(apply(df_topics[, topic_cols], 1, which.max), levels = 1:length(topic_cols))
     
-    # 这里兼容 Gene-as-word 和 SS-as-word 的 Display_Name 逻辑
+    # This handles both Gene-as-word and SS-as-word Display_Name logic
     if("label2" %in% colnames(df_topics)) {
         df_topics$Display_Name <- paste0(df_topics$Disease, " (", df_topics$label2, ")")
     } else {
@@ -60,7 +60,7 @@ run_downstream_ss_lda <- function(input_mat, final_res, meta_df, best_k, best_th
     df_melt$TopicNum <- gsub("\\D", "", as.character(df_melt$Topic))
     
     p <- ggplot(df_melt, aes(x=Probability, y=Disease_Unique, fill=Topic)) +
-      geom_bar(stat="identity", position="stack", width = 0.85) + # 柱子稍微变细一点点，增加透气感
+      geom_bar(stat="identity", position="stack", width = 0.85) + # Slightly thinner bars for better breathing room
       geom_text(data = subset(df_melt, Probability >= 0.05), aes(label = TopicNum), position = position_stack(vjust = 0.5), size = 6, color = "black", fontface = "bold") +
       scale_y_discrete(labels=setNames(as.character(df_topics$Display_Name), df_topics$Disease_Unique)) + 
       theme_classic() + 
@@ -72,13 +72,13 @@ run_downstream_ss_lda <- function(input_mat, final_res, meta_df, best_k, best_th
         axis.title.x = element_text(size = 22, face = "bold", margin = margin(t = 15)),
         legend.text = element_text(size = 16), 
         legend.title = element_text(size = 18, face = "bold"),
-        plot.margin = margin(20, 30, 20, 20) # 增加四周的留白，防止标签被切掉
+        plot.margin = margin(20, 30, 20, 20) # Add margin around plot to prevent label clipping
       )
       
-    # 【核心修复】：将 width 从 14 提高到 22，彻底解决横向挤压的问题
+    # [Core Fix]: Increased width from 14 to 22 to completely resolve horizontal compression
     ggsave(out_file, p, width=22, height=max(10, nrow(df_topics) * 0.5), limitsize = FALSE)
   }  
-  # Top Words Mapping (SS-as-word 专属)
+  # Top Words Mapping (SS-as-word specific)
   plot_mapped_top_words <- function(top_word_df, master_map, title_str, out_file) {
     top_word_df$clean_id <- tolower(trimws(gsub("^finngen_R12_|\\.list$|\\.tsv\\.bgz$|\\.txt$", "", top_word_df$Comorbidity)))
     if (!is.null(master_map)) {

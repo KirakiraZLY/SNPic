@@ -224,12 +224,12 @@ prepare_visualization_data <- function(topic_tissue_data) {
   return(processed_data)
 }
 
-#' [核心修改区]：Analyze topic-tissue associations using Tissue Specificity Normalization
+#' [Core Modification Zone]: Analyze topic-tissue associations using Tissue Specificity Normalization
 analyze_topic_tissue_association <- function(topic_gene_df, expression_data, top_tissues_per_topic = 5) {
   
   topic_gene_clean <- topic_gene_df %>% mutate(geneSymbol = clean_gene_names(Comorbidity))
   
-  # 1. 基因层面的归一化：计算基因表达在各个组织的分配比例 (Gene-wise Specificity)
+  # 1. Gene-level normalization: calculate gene expression allocation proportions across tissues (Gene-wise Specificity)
   expression_normalized <- expression_data %>%
     group_by(geneSymbol) %>%
     mutate(
@@ -238,8 +238,8 @@ analyze_topic_tissue_association <- function(topic_gene_df, expression_data, top
     ) %>%
     ungroup()
     
-  # 2. [新增] 组织层面的基线背景计算 (Tissue-wise Background)
-  # 计算在所有被查询的基因中，每个器官的平均背景表达比例（用于抓出睾丸这类广泛表达的刺客）
+  # 2. [New] Tissue-wise background calculation (Tissue-wise Background)
+  # Calculate the average background expression proportion of each organ across all queried genes (to catch broadly expressed outliers like testis)
   tissue_background <- expression_normalized %>%
     group_by(tissueSiteDetail) %>%
     summarise(
@@ -247,7 +247,7 @@ analyze_topic_tissue_association <- function(topic_gene_df, expression_data, top
       .groups = 'drop'
     )
   
-  # 3. 汇总至 Topic 层级，并进行背景相对倍数折算 (Fold Enrichment)
+  # 3. Aggregate to Topic level and compute relative fold enrichment over background (Fold Enrichment)
   topic_tissue_expression <- topic_gene_clean %>%
     left_join(expression_normalized, by = "geneSymbol", relationship = "many-to-many") %>%
     group_by(Topic, tissueSiteDetail) %>%
@@ -258,17 +258,17 @@ analyze_topic_tissue_association <- function(topic_gene_df, expression_data, top
       .groups = 'drop'
     ) %>%
     filter(!is.na(mean_expression)) %>%
-    # 联结组织背景分数
+    # Join tissue background scores
     left_join(tissue_background, by = "tissueSiteDetail") %>%
     mutate(
-      # [核心算法] 相对富集分 = 该Topic平均分 / 组织的背景均分 (Fold Change)
+      # [Core Algorithm] Relative enrichment score = Topic mean / tissue background mean (Fold Change)
       normalized_score = ifelse(tissue_bg_score > 0, mean_expression / tissue_bg_score, 0)
     ) %>%
     arrange(Topic, desc(normalized_score))
   
   top_tissues <- topic_tissue_expression %>%
     group_by(Topic) %>%
-    # 改为依据归一化后的分数进行选取和排行
+    # Switch to selection and ranking based on the normalized score
     slice_max(order_by = normalized_score, n = top_tissues_per_topic, with_ties = FALSE) %>%
     ungroup()
   
@@ -290,7 +290,7 @@ prepare_sankey_data <- function(topic_tissue_data, min_expression = 0) {
     mutate(
       source = match(as.numeric(as.character(Topic)), topics_ordered) - 1,
       target = match(tissueSiteDetail, tissues) + length(topic_nodes) - 1,
-      value = normalized_score # 更新为使用新的富集度
+      value = normalized_score # Updated to use the new enrichment metric
     ) %>%
     dplyr::select(source, target, value)
   
@@ -375,10 +375,10 @@ create_tissue_bar_plot <- function(topic_tissue_data, top_n_tissues = 5) {
       group_by(TopicNum) %>% 
       slice_max(order_by = normalized_score, n = top_n_tissues, with_ties = FALSE) %>% 
       ungroup() %>%
-      # 将重新排序的度量标准换为 normalized_score
+      # Replace the reordered metric with normalized_score
       mutate(tissue_ordered = tidytext::reorder_within(str_wrap(tissueSiteDetail, 25), normalized_score, TopicNum))
     
-    # 绘图指标全面指向 normalized_score
+    # All plot metrics point to normalized_score
     p <- ggplot(plot_data, aes(x = tissue_ordered, y = normalized_score, fill = as.character(TopicNum))) +
       geom_col(alpha = 0.9, width = 0.75) + 
       scale_fill_manual(values = global_palette) +

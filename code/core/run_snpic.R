@@ -1,4 +1,4 @@
-#!/usr/bin/env Rscript
+﻿#!/usr/bin/env Rscript
 
 ############################################
 # 0. Parse Command Line Arguments
@@ -63,13 +63,13 @@ if (opt$mode == "gene" && is.null(opt$snp_gene_map)) {
 ############################################
 # 1. Load dependencies & Setup (Auto-detect Path)
 ############################################
-# 自动获取当前主脚本所在目录
+# Auto-detect main script directory
 args_info <- commandArgs(trailingOnly = FALSE)
 file_arg <- grep("--file=", args_info, value = TRUE)
 if (length(file_arg) > 0) {
   script_dir <- dirname(sub("--file=", "", file_arg[1]))
 } else {
-  script_dir <- getwd() # 如果不是通过 Rscript 运行，默认使用当前工作目录
+  script_dir <- getwd() # Default to cwd if not run via Rscript
 }
 
 dependency_file <- file.path(script_dir, "snpic_ss_dependency.R")
@@ -94,7 +94,7 @@ k_range <- c(opt$k_min:opt$k_max)
 n_bootstrap <- opt$n_bootstrap
 master_map_file <- opt$master_map
 
-# === 【核心路由一】：矩阵生成模式 ===
+# === 【Core Router 1】：Matrix construction mode ===
 if (opt$mode == "gene") {
   cat("Constructing Gene-as-Word Matrix...\n")
   matrix_result <- run_gene_as_word_analysis(folder = folder1, snp_gene_map_file = opt$snp_gene_map, prefix = NULL, top_n_genes = 99999)
@@ -103,7 +103,7 @@ if (opt$mode == "gene") {
   matrix_result <- calculate_shared_snp_matrix(folder1 = folder1, folder2 = folder1, plot_heatmap = FALSE, plot_dendrogram = FALSE, prefix = NULL)
 }
 
-# 清洗与格式化
+# Clean and format
 matrix_result <- matrix_result[apply(matrix_result, 1, function(x) !all(x == 0)), ]
 matrix_result <- matrix_result[, apply(matrix_result, 2, function(x) !all(x == 0))]
 input_mat <- as.matrix(matrix_result)
@@ -197,7 +197,7 @@ calculate_robust_similarity <- function(bootstrap_list, penalty_lambda = 1.0) {
 
 if (is.null(opt$k_only)) {
   # =========================================================
-  # 正常路线：执行 Bootstrap -> 选择最佳 K -> 画稳定性图
+  # Normal path: Bootstrap -> Select Best K -> Plot Stability
   # =========================================================
   results_by_k <- list() 
   stability_summary <- data.frame(k = integer(), mean_confidence = numeric(), threshold_used = numeric())
@@ -313,7 +313,7 @@ if (is.null(opt$k_only)) {
   # Fast Mode
   # =========================================================
   best_k <- opt$k_only
-  opt$keep_all_traits <- TRUE # 隐式强制保留所有疾病
+  opt$keep_all_traits <- TRUE # Implicitly force keep all diseases
   best_thresh <- 0 
   
   cat("\n============================================\n")
@@ -322,12 +322,12 @@ if (is.null(opt$k_only)) {
   
   disease_ids <- rownames(input_mat)
   
-  # 伪造全 1.0 的 Confidence Score 欺骗下游画图，防止报错
+  # Fake full 1.0 Confidence Scores to prevent downstream plotting errors
   dummy_conf <- rep(1.0, length(disease_ids))
   names(dummy_conf) <- disease_ids
   final_res <- list(confidence_score = dummy_conf)
   
-  # 解析映射表以获取下游需要的 meta_df 格式
+  # Parse mapping table for downstream meta_df format
   meta_df <- data.frame(Disease = disease_ids, stringsAsFactors = FALSE)
   meta_df$clean_id <- gsub("^finngen_R12_|\\.list$|\\.tsv\\.bgz$", "", meta_df$Disease)
   

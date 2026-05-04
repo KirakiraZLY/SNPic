@@ -1,44 +1,44 @@
-library(maptpx)
+﻿library(maptpx)
 library(reshape2)
 library(ggplot2)
 library(dplyr)
 library(umap)
 set.seed(123)
 run_mixed_membership <- function(matrix_result, k = 5, custom_order = NULL, master_map = NULL, standardize_by_row = TRUE,
-                                 # 可调整的超参数
-                                 tol = 0.01,         # 收敛阈值
-                                 shape = 0.01,       # 先验形状参数
-                                 tmax = 2000,        # 最大迭代次数
-                                 verb = 1,           # 输出详细程度
-                                 # 新增可调参数
-                                 init_type = "random", # 初始化类型
-                                 prior_weight = 0.1) { # 先验权重
+                                 # Tunable hyperparameters
+                                 tol = 0.01,         # Convergence threshold
+                                 shape = 0.01,       # Prior shape parameter
+                                 tmax = 2000,        # Maximum iterations
+                                 verb = 1,           # Verbose level
+                                 # New adjustable parameters
+                                 init_type = "random", # Initialization type
+                                 prior_weight = 0.1) { # Prior weight
   
-  # 数据标准化处理
+  # Data standardization
   if (standardize_by_row) {
-    # 按行标准化 (Standardize by row)
+    # Standardize by row
     dtm_scaled <- as.data.frame(t(scale(t(matrix_result))))
   } else {
-    # 按列标准化 (Standardize by col)
+    # Standardize by column
     dtm_scaled <- as.data.frame(scale(matrix_result))
   }
 
-  # 确保非负
+  # Ensure non-negative
   dtm_scaled <- dtm_scaled - min(dtm_scaled, na.rm = TRUE)
 
-  # 转换为矩阵并确保非负
+  # Convert to matrix, ensure non-negative
   dtm <- as.matrix(dtm_scaled)
   dtm[dtm < 0] <- 0
-  # 去掉全零行
+  # Remove all-zero rows
   dtm <- dtm[rowSums(dtm != 0) > 0, ]
   
-  # 转成 DocumentTermMatrix
+  # Convert to DocumentTermMatrix
   dtm_dtm <- as.DocumentTermMatrix(
     slam::as.simple_triplet_matrix(dtm),
     weighting = weightTf
   )
   
-  # 运行 topics()
+  # Run topics()
   mmt_model <- maptpx::topics(
     dtm_dtm,
     K = k,
@@ -46,9 +46,9 @@ run_mixed_membership <- function(matrix_result, k = 5, custom_order = NULL, mast
     verb = verb,
     tmax = tmax,
     shape = shape,
-    # 可能的其他参数
-    initopics = NULL,  # 可以指定初始主题
-    bf = FALSE         # 是否使用BFGS优化
+    # Possible additional parameters
+    initopics = NULL,  # Can specify initial topics
+    bf = FALSE         # Whether to use BFGS optimization
   )
   
   # Step 3: Extract posterior topic distribution per disease (theta)
@@ -61,7 +61,7 @@ run_mixed_membership <- function(matrix_result, k = 5, custom_order = NULL, mast
   df_topics$Disease <- rownames(df_topics)
   df_melted <- reshape2::melt(df_topics, id.vars = "Disease", variable.name = "Topic", value.name = "Probability")
   
-  # 修改第一个图 - 旋转90度
+  # Modify first plot - rotate 90 degrees
   gg1 <- ggplot(df_melted, aes(x = Probability, y = Disease, fill = Topic)) +
     geom_bar(stat = "identity", position = "stack") +
     theme_minimal() +
@@ -71,10 +71,10 @@ run_mixed_membership <- function(matrix_result, k = 5, custom_order = NULL, mast
           legend.position = "right")
   # print(gg1)
   
-  # Step 5: MaxTopic 处理和第二个图
+  # Step 5: MaxTopic processing and second plot
   df_topics$MaxTopic <- apply(topics_matrix, 1, which.max)
   
-  # 使用自定义顺序（如果未提供则使用默认排序）
+  # Use custom order (default sort if not provided)
   if (is.null(custom_order)) {
     custom_order <- sort(unique(df_topics$MaxTopic))
   }
@@ -83,8 +83,8 @@ run_mixed_membership <- function(matrix_result, k = 5, custom_order = NULL, mast
                                levels = custom_order,
                                labels = paste0("Topic", custom_order))
   
-  # 只融化主题概率列
-  topic_cols <- grep("^Topic\\d+$", names(df_topics), value = TRUE) # 获取所有主题列
+  # Melt only topic probability columns
+  topic_cols <- grep("^Topic\\d+$", names(df_topics), value = TRUE) # Get all topic columns
   
   df_melted <- df_topics %>%
     pivot_longer(
@@ -93,7 +93,7 @@ run_mixed_membership <- function(matrix_result, k = 5, custom_order = NULL, mast
       values_to = "Probability"
     )
   
-  # 修改第二个图 - 旋转90度
+  # Modify second plot - rotate 90 degrees
   gg2 <- ggplot(df_melted, aes(x = Probability, y = Disease, fill = Topic)) +
     geom_col(position = "stack") +
     theme_minimal(base_size = 12) +
@@ -105,16 +105,16 @@ run_mixed_membership <- function(matrix_result, k = 5, custom_order = NULL, mast
     ) +
     theme(
       axis.text.y = element_text(size = 14),
-      panel.grid.major.y = element_blank(),  # 改为 major.y
+      panel.grid.major.y = element_blank(),  # Changed to major.y
       plot.margin = margin(10, 10, 10, 10),
-      legend.position = "right"  # 图例放在右侧
+      legend.position = "right"  # Legend on the right
     ) +
     guides(fill = guide_legend(nrow = 2))
   
-  # 当疾病过多时添加分面 - 调整分面方向
+  # Add facets when too many diseases - adjust facet direction
   if (n_distinct(df_melted$Disease) > 30) {
     gg2 <- gg2 + 
-      facet_grid(MaxTopic ~ ., scales = "free_y", space = "free_y") +  # 改为垂直分面
+      facet_grid(MaxTopic ~ ., scales = "free_y", space = "free_y") +  # Changed to vertical facets
       theme(
         axis.text.y = element_text(size = 6),
         strip.text = element_text(size = 8)
@@ -132,11 +132,11 @@ run_mixed_membership <- function(matrix_result, k = 5, custom_order = NULL, mast
     topic_matrix2 = topic_matrix2,
     gene_terms = mmt_model$theta,  # terms per topic
     topic_df = df_melted,
-    standardized_matrix = dtm_scaled  # 返回标准化后的矩阵
+    standardized_matrix = dtm_scaled  # Return standardized matrix
   ))
 }
 
-# 统一且纯净的 resolve_labels 函数
+# Unified and clean resolve_labels function
 resolve_labels <- function(df, master_map = NULL) {
   if (is.null(master_map)) {
     df$label <- "Other"
@@ -144,23 +144,23 @@ resolve_labels <- function(df, master_map = NULL) {
     return(df)
   }
   
-  # 清理疾病名称用于匹配
+  # Clean disease names for matching
   if (!"disease_clean" %in% colnames(df)) {
     df$disease_clean <- gsub("^finngen_R12_|\\.list$|\\.tsv\\.bgz$", "", df$Disease)
   }
   
-  # 防止重复匹配导致数据膨胀
+  # Prevent data inflation from duplicate matching
   master_sub <- master_map[!duplicated(master_map$clean_filename), c("clean_filename", "trait", "label1", "label2")]
   
-  # 合并
+  # Merge
   df_merged <- merge(df, master_sub, by.x = "disease_clean", by.y = "clean_filename", all.x = TRUE)
   
-  # 覆盖原列：有 trait 用 trait，有 label1 用 label1，否则给默认值
+  # Override: use trait if available, label1 if available, otherwise defaults
   df_merged$Disease <- ifelse(!is.na(df_merged$trait) & df_merged$trait != "", df_merged$trait, df_merged$Disease)
   df_merged$label <- ifelse(!is.na(df_merged$label1) & df_merged$label1 != "", df_merged$label1, "Other")
   df_merged$label2 <- ifelse(!is.na(df_merged$label2) & df_merged$label2 != "", df_merged$label2, "Unknown")
   
-  # 剔除辅助列
+  # Remove auxiliary columns
   df_merged$disease_clean <- NULL
   df_merged$trait <- NULL
   df_merged$label1 <- NULL
@@ -175,7 +175,7 @@ plot_top_genes <- function(gene_terms, top_n = 10) {
   
   gene_long <- reshape2::melt(gene_df, id.vars = "Gene", variable.name = "Topic", value.name = "Weight")
   
-  # 选出每个 topic 中 top_n 个基因
+  # Select top_n genes per topic
   top_genes <- gene_long %>%
     group_by(Topic) %>%
     top_n(top_n, Weight) %>%
@@ -188,11 +188,11 @@ plot_top_genes <- function(gene_terms, top_n = 10) {
     theme_minimal(base_size = 12) +
     theme_classic() +
     theme(
-      text = element_text(size = 12),           # 所有文本字号为12
-      axis.text = element_text(size = 12),      # 坐标轴文本字号为12
-      axis.title = element_text(size = 12),     # 坐标轴标题字号为12
-      plot.title = element_text(size = 12),     # 图表标题字号为12
-      strip.text = element_text(size = 12)      # 分面标题字号为12
+      text = element_text(size = 12),           # All text font size is 12
+      axis.text = element_text(size = 12),      # Axis text font size is 12
+      axis.title = element_text(size = 12),     # Axis title font size is 12
+      plot.title = element_text(size = 12),     # Plot title font size is 12
+      strip.text = element_text(size = 12)      # Facet strip text font size is 12
     ) +
     labs(
       title = paste("Top", top_n, "genes for each topic"),
@@ -220,7 +220,7 @@ plot_umap_topics <- function(topic_matrix,
   # label
   umap_df <- resolve_labels(umap_df, master_map)
   
-  # 获取颜色配置
+  # Get color configuration
   custom_colors <- get_network_colors()
   unique_labels <- unique(umap_df$label)
   n_labels <- length(unique_labels)
@@ -259,10 +259,10 @@ plot_pca_topics <- function(topic_matrix, prefix = NULL, master_map = NULL) {
     MaxTopic = apply(topic_matrix, 1, which.max)
   )
   
-  # 直接使用 resolve_labels 函数设置标签
+  # Directly use resolve_labels to set labels
   df_pca <- resolve_labels(df_pca, master_map)
   
-  # 获取颜色配置
+  # Get color configuration
   custom_colors <- get_network_colors()
   unique_labels <- unique(df_pca$label)
   n_labels <- length(unique_labels)
