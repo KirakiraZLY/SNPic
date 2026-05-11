@@ -22,52 +22,7 @@ If you use SNPic in your research, please cite our paper:
 
 ---
 
-## 📂 Repository Structure
-
-```
-SNPic/
-├── snpic/                          # Python wrapper & CLI
-│   ├── __init__.py
-│   ├── cli.py
-│   └── requirements.txt
-├── code/
-│   ├── core/                       # Core SNPic R pipeline
-│   │   ├── run_snpic.R             #   Main CLI dispatcher
-│   │   ├── LDA_for_snpic_ss.R      #   LDA topic model
-│   │   ├── mixed_membership_topics.R  # Gaussian mixed-membership
-│   │   ├── snpic_ss_dependency.R   #   Environment setup
-│   │   ├── snpic_geneasword_downstream_lda.R
-│   │   ├── snpic_geneasword_downstream_gaussian.R
-│   │   ├── snpic_sumstat_asword_downstream_lda.R
-│   │   ├── snpic_sumstat_asword_downstream_gaussian.R
-│   │   ├── snpic_ss_similarity_analysis.R
-│   │   ├── snpic_ss_pathway_enrichment_analysis.R
-│   │   ├── snpic_ss_human_protein_analysis.R
-│   │   ├── snpic_ss_ground_truth_comparison.R
-│   │   └── snp_gene_map_merged_finngen_ukbb.txt
-│   └── utils/                      # Utility scripts
-│       ├── gene_noncoding_remove.R
-│       └── run_v2f_gtex_union_mapping.R
-├── data/
-│   ├── master_map/                 # Trait meta-information CSVs
-│   │   ├── master_disease_mapping.csv
-│   │   └── master_disease_mapping_detail.csv
-│   └── sig_snp_list/               # Demo GWAS SNP lists
-├── environment/
-│   ├── Dockerfile
-│   └── postInstall
-├── figure/                         # Output figures
-├── .github/workflows/
-│   └── r-cmd-check.yml             # CI: R CMD check
-├── .gitignore
-├── CITATION.cff
-├── environment.yml
-├── LICENSE
-├── README.md
-└── run                              # Docker capsule entrypoint
-```
-
-### Pipeline Architecture
+## Pipeline Architecture
 
 The core analysis pipeline uses a unified dispatcher architecture:
 
