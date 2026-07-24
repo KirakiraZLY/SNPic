@@ -11,13 +11,11 @@ on:
 jobs:
   snpic-check:
     runs-on: ubuntu-latest
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
       - uses: actions/checkout@v4
 
       - name: Setup Micromamba (fast Conda)
-        uses: mamba-org/setup-micromamba@v2
+        uses: mamba-org/setup-micromamba@v1
         with:
           environment-file: environment.yml
           environment-name: snpic_env
