@@ -22,7 +22,52 @@ If you use SNPic in your research, please cite our paper:
 
 ---
 
-## Pipeline Architecture
+## 📂 Repository Structure
+
+```
+SNPic/
+├── snpic/                          # Python wrapper & CLI
+│   ├── __init__.py
+│   ├── cli.py
+│   └── requirements.txt
+├── code/
+│   ├── core/                       # Core SNPic R pipeline
+│   │   ├── run_snpic.R             #   Main CLI dispatcher
+│   │   ├── LDA_for_snpic_ss.R      #   LDA topic model
+│   │   ├── mixed_membership_topics.R  # Gaussian mixed-membership
+│   │   ├── snpic_ss_dependency.R   #   Environment setup
+│   │   ├── snpic_geneasword_downstream_lda.R
+│   │   ├── snpic_geneasword_downstream_gaussian.R
+│   │   ├── snpic_sumstat_asword_downstream_lda.R
+│   │   ├── snpic_sumstat_asword_downstream_gaussian.R
+│   │   ├── snpic_ss_similarity_analysis.R
+│   │   ├── snpic_ss_pathway_enrichment_analysis.R
+│   │   ├── snpic_ss_human_protein_analysis.R
+│   │   ├── snpic_ss_ground_truth_comparison.R
+│   │   └── snp_gene_map_merged_finngen_ukbb.txt
+│   └── utils/                      # Utility scripts
+│       ├── gene_noncoding_remove.R
+│       └── run_v2f_gtex_union_mapping.R
+├── data/
+│   ├── master_map/                 # Trait meta-information CSVs
+│   │   ├── master_disease_mapping.csv
+│   │   └── master_disease_mapping_detail.csv
+│   └── sig_snp_list/               # Demo GWAS SNP lists
+├── environment/
+│   ├── Dockerfile
+│   └── postInstall
+├── figure/                         # Output figures
+├── .github/workflows/
+│   └── r-cmd-check.yml             # CI: R CMD check
+├── .gitignore
+├── CITATION.cff
+├── environment.yml
+├── LICENSE
+├── README.md
+└── run                              # Docker capsule entrypoint
+```
+
+### Pipeline Architecture
 
 The core analysis pipeline uses a unified dispatcher architecture:
 
@@ -331,7 +376,6 @@ print(f"SNPic completed with exit code: {result.returncode}")
 Our new preprint "SNPic" is officially live on bioRxiv!  
 DOI: [https://doi.org/10.64898/2026.04.22.720106](https://doi.org/10.64898/2026.04.22.720106)   
 LinkedIn post: [LinkedIn](https://www.linkedin.com/posts/zhang-leyi-%E5%BC%A0%E4%B9%90%E8%89%BA-8010a9214_snpic-gwas-topicmodeling-activity-7454387884368932864--AK6?utm_source=share&utm_medium=member_desktop&rcm=ACoAADYea0EBp7O02REtJW0m2wO_YAdvxND0Fcg)    
-Code Ocean Link: [CodeOcean](https://codeocean.com/capsule/8324245/tree)   
 Enjoy reading it, and feel free to drop your brutal feedback! 😈😈😈
 ![SNPic description](./figure/fig1_graphical_abstract.png)
 
