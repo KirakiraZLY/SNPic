@@ -354,4 +354,28 @@ if (opt$mode == "gene") {
   if (opt$model %in% c("gaussian", "both")) run_downstream_ss_gaussian(input_mat, final_res, meta_df, best_k, best_thresh, master_map, prefix, output_dir, opt$seed, opt$keep_all_traits)
 }
 
+# =============================================================
+# Audit: Evidence-DAG Sidecar Hook
+# =============================================================
+audit_sidecar <- "D:/openclaw/knowledge_base/scripts/audit_sidecar.py"
+audit_desc <- sprintf("SNPic pipeline: mode=%s, model=%s, K=%s, seed=%d, bootstrap=%d",
+  opt$mode, opt$model, best_k, opt$seed, ifelse(is.null(opt$k_only), opt$n_bootstrap, 0))
+audit_result <- sprintf("Best K=%d, threshold=%.3f, traits=%d, mode=%s",
+  best_k, best_thresh, nrow(input_mat), opt$mode)
+audit_inputs <- paste(c(opt$input_folder, opt$master_map, opt$snp_gene_map), collapse = "|")
+audit_outputs <- paste0(prefix, "_*")
+
+system2("python", c(
+  audit_sidecar,
+  "--type", "pipeline_run",
+  "--desc", shQuote(audit_desc),
+  "--result", shQuote(audit_result),
+  "--inputs", shQuote(audit_inputs),
+  "--outputs", shQuote(audit_outputs),
+  "--confidence", "high",
+  "--claims", "",
+  "--kb", "syntheses/synthesis.evidence-hexagon.md",
+  "--agent", "SNPic Pipeline"
+), stdout = TRUE, wait = TRUE)
+
 cat("\nPipeline Execution Finished Successfully.\n")
